@@ -1,0 +1,1 @@
+ALTER TABLE `wzsport_class` CHANGE `gradle` `grade` smallint(4) NULL DEFAULT NULL

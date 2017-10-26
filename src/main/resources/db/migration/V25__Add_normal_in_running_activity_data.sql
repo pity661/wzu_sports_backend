@@ -1,0 +1,1 @@
+ALTER TABLE `wzsport`.`wzsport_running_activity_data` ADD COLUMN `normal` tinyint(1) NOT NULL DEFAULT 0 AFTER `location_type`;

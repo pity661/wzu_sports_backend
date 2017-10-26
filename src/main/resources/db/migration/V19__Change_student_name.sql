@@ -1,0 +1,1 @@
+ALTER TABLE `wzsport_student` CHANGE `name` `name` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL

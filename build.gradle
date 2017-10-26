@@ -1,0 +1,225 @@
+buildscript {
+  repositories {
+    maven {
+      url 'http://maven.aliyun.com/nexus/content/groups/public/'
+    }
+  }
+  dependencies {
+    classpath "gradle.plugin.com.boxfuse.client:flyway-release:4.2.0"
+    classpath group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
+    classpath "org.hidetake:gradle-ssh-plugin:2.9.0"
+    classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.2.RELEASE")
+  }
+}
+
+plugins {
+    id 'java'
+    id 'war'
+    id 'eclipse-wtp'
+    id 'org.flywaydb.flyway' version '4.2.0'
+    id "org.hidetake.ssh" 	 version "2.9.0"
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+//apply plugin: 'org.springframework.boot'
+
+jar {
+    baseName = 'gs-rest-service'
+    version =  '0.1.0'
+}
+
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+//dependencies {
+//    compile("org.springframework.boot:spring-boot-starter-web")
+//    testCompile('org.springframework.boot:spring-boot-starter-test')
+//}
+
+repositories {
+    maven {
+        url 'http://maven.aliyun.com/nexus/content/groups/public/'
+    }
+}
+
+dependencies {
+	compile 'org.springframework:spring-webmvc:4.3.8.RELEASE'
+	compile 'org.springframework:spring-jdbc:4.3.8.RELEASE'
+	compile group: 'org.apache.shiro', name: 'shiro-spring', version: '1.3.2'
+	compile group: 'org.aspectj', name: 'aspectjweaver', version: '1.8.10'
+	compile group: 'org.apache.logging.log4j', name: 'log4j-web', version: '2.8.2'
+	compile group: 'org.mybatis', name: 'mybatis', version: '3.4.4'
+	compile group: 'org.mybatis', name: 'mybatis-spring', version: '1.3.1'
+	compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
+	compile group: 'com.google.code.gson', name: 'gson', version: '2.8.0'
+	compile 'com.graphql-java:graphql-java:2.4.0'
+	compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.7.0'
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.8.1'
+	compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.7.0'
+	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.5'
+	compile 'javax.servlet:javax.servlet-api:3.0.1'
+    compile group: 'org.mybatis.generator', name: 'mybatis-generator-core', version: '1.3.5'
+    compile group: 'com.github.javafaker', name: 'javafaker', version: '0.13'
+    compile group: 'joda-time', name: 'joda-time', version: '2.9.9'
+    compile group: 'com.github.pagehelper', name: 'pagehelper', version: '5.0.2'
+    compile group: 'commons-logging', name: 'commons-logging', version: '1.1.1'
+    compile group: 'c3p0', name: 'c3p0', version: '0.9.0.4'
+    compile 'com.qiniu:qiniu-java-sdk:7.2.+'
+    compile group: 'org.json', name: 'json', version: '20160810'
+
+    testCompile 'junit:junit:4.12'
+    testCompile group: 'org.springframework', name: 'spring-test', version: '4.3.8.RELEASE'
+
+    compile group: 'com.liferay', name: 'org.apache.commons.fileupload', version: '1.2.2.LIFERAY-PATCHED-1'
+}
+def env = System.getProperty("env") ?: "product"
+
+ext {
+	configProperties = new Properties()
+
+    file("$project.rootDir/src/main/environment/" + env + "/config.properties").withInputStream {configProperties.load(it)}
+    file("src/main/resources/gradle.properties").withInputStream {configProperties.load(it)}
+
+    configProperties.each {
+        project.extensions.add("$it.key",it.value);
+    }
+}
+
+//configProperties.load(new FileInputStream("$project.rootDir/src/main/environment/" + env + "/config.properties"))
+
+flyway {
+    url = configProperties['database.url']
+    user = configProperties['database.username']
+    password = configProperties['database.password']
+}
+
+
+sourceSets {
+    main {
+        resources {
+            srcDirs = ["src/main/resources", "src/main/environment/$env"]
+        }
+    }
+}
+processResources {
+	from('src/main/java') {
+		include '**/*.class'
+		include '**/*.xml'
+	}
+	
+	from('src/main/resources') {
+		include "src/main/environment/$env"
+	}
+}
+
+remotes {
+  testServer {
+    host = '120.77.72.16'
+    user = 'root'
+    identity = file(System.getProperty('user.home') + '/.ssh/id_rsa_16')
+  }
+  
+  productServer {
+    host = '59.110.142.240'
+    user = 'root'
+    identity = file(System.getProperty('user.home') + '/.ssh/id_rsa_240')
+  }
+}
+
+task deploy(dependsOn: [war]) {
+  doLast {
+  	switch (env) {
+  	  case 'test':
+  	  case 'dev':
+  	    println 'start deploy to ' + env
+	    ssh.run {
+	      session(remotes.testServer) {
+	      	remove '/usr/local/webserver/tomcat/webapps/wzsport-server.war'
+	        put from: buildDir.toString() + '/libs/wzsport-server.war', into: '/usr/local/webserver/tomcat/webapps/'
+	        execute 'export JAVA_HOME=/usr/local/jdk1.8.0_71; /usr/local/webserver/tomcat/bin/shutdown.sh'
+	        execute 'export JAVA_HOME=/usr/local/jdk1.8.0_71; /usr/local/webserver/tomcat/bin/startup.sh'
+	      }
+	    }
+  	    break
+  	  case 'product':
+	  	println 'start deploy to ' + env
+		ssh.run {
+		  session(remotes.productServer) {
+//		  	remove '/usr/local/webserver/tomcat/webapps/wzsport-server.war'
+		    put from: buildDir.toString() + '/libs/wzsport-server.war', into: '/usr/local/webserver/tomcat/webapps/'
+		    execute 'export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.141-1.b16.el7_3.x86_64/jre/; /usr/local/webserver/tomcat/bin/shutdown.sh'
+		    execute 'export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.141-1.b16.el7_3.x86_64/jre/; /usr/local/webserver/tomcat/bin/startup.sh'
+		  }
+		}
+  	    break
+  	  default:
+  	  	println 'env: ' + env
+  	    throw new RuntimeException("环境变量应该设置为test、dev或者product")
+  	}
+  }
+}
+
+//与eclipse集成的相关配置
+eclipse {
+	//对应eclipse项目.project文件的配置
+	project {
+	}
+	//对应eclipse项目.classpath文件的配置
+	classpath {
+	}
+	//eclipse兼容性配置
+	jdt {
+		sourceCompatibility = 1.8
+    	targetCompatibility = 1.8
+	}
+	//eclipse web项目配置
+    wtp {
+    	component {
+    		resource sourcePath: './src/main/environment/$env', deployPath:'/WEB-INF/classes'
+    	}
+        facet {
+            facet name: 'jst.web', version: '3.0'
+            facet name: 'jst.java', version: '1.8'
+        }
+    }
+}
+
+
+task mybatisGenerate << {
+    ant.properties['targetProject'] = projectDir.path
+    ant.properties['driverClass'] = configProperties['database.driver']
+    ant.properties['connectionURL'] = configProperties['database.url']
+    ant.properties['userId'] = configProperties['database.username']
+    ant.properties['password'] = configProperties['database.password']
+    ant.properties['src_main_java'] = sourceSets.main.java.srcDirs[0].path
+    ant.properties['src_main_resources'] = sourceSets.main.resources.srcDirs[0].path
+    ant.properties['modelPackage'] = configProperties["modelPackage"]
+    ant.properties['mapperPackage'] = configProperties["mapperPackage"]
+    ant.properties['sqlMapperPackage'] = configProperties["sqlMapperPackage"]
+    ant.taskdef(
+            name: 'mbgenerator',
+            classname: 'org.mybatis.generator.ant.GeneratorAntTask',
+            classpath: configurations.mybatisGenerator.asPath
+    )
+    ant.mbgenerator(overwrite: true,
+            configfile: 'src/main/resources/generatorConfig.xml', verbose: true) {
+        propertyset {
+            propertyref(name: 'targetProject')
+            propertyref(name: 'userId')
+            propertyref(name: 'driverClass')
+            propertyref(name: 'connectionURL')
+            propertyref(name: 'password')
+            propertyref(name: 'src_main_java')
+            propertyref(name: 'src_main_resources')
+            propertyref(name: 'modelPackage')
+            propertyref(name: 'mapperPackage')
+            propertyref(name: 'sqlMapperPackage')
+        }
+    }
+}

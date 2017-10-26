@@ -1,0 +1,1 @@
+ALTER TABLE `wzsport`.`wzsport_running_activity` CHANGE COLUMN `target_time` `target_finished_time` int(11) NOT NULL DEFAULT 0;

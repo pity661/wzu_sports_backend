@@ -1,0 +1,1 @@
+ALTER TABLE `wzsport`.`wzsport_running_activity_data` CHANGE COLUMN `normal` `is_normal` tinyint(1) NOT NULL DEFAULT 0;

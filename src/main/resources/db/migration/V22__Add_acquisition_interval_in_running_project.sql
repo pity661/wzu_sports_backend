@@ -1,0 +1,1 @@
+ALTER TABLE `wzsport`.`wzsport_running_project` ADD COLUMN `acquisition_interval` tinyint(2) UNSIGNED NOT NULL DEFAULT 1 AFTER `hourly_calorie_consumption`;

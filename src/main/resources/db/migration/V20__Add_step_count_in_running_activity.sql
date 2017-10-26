@@ -1,0 +1,1 @@
+ALTER TABLE `wzsport`.`wzsport_running_activity` ADD COLUMN `step_count` smallint(5) UNSIGNED NOT NULL DEFAULT 0 AFTER `distance`

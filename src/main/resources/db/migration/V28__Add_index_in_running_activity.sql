@@ -1,0 +1,1 @@
+ALTER TABLE `wzsport`.`wzsport_running_activity` ADD COLUMN `qualified_distance` int(11) UNSIGNED NOT NULL DEFAULT 0 AFTER `ended`, ADD COLUMN `qualified_cost_time` int(11) UNSIGNED NOT NULL DEFAULT 0 AFTER `qualified_distance`, ADD COLUMN `min_cost_time` int(11) UNSIGNED NOT NULL DEFAULT 0 AFTER `qualified_cost_time`;

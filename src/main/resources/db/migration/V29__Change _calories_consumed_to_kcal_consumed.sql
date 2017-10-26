@@ -1,0 +1,1 @@
+ALTER TABLE `wzsport`.`wzsport_running_activity` CHANGE COLUMN `calories_consumed` `kcal_consumed` int(11) NOT NULL DEFAULT 0;
