@@ -398,6 +398,7 @@ public class RunningActivityType {
 	                	}
 	                	
 	                	PageHelper.startPage(environment.getArgument("pageNumber"), environment.getArgument("pageSize"));
+	                	runningActivityExample.setOrderByClause("start_time desc");
 	                	List<RunningActivity> runningActivityList = runningActivityMapper.selectByExample(runningActivityExample);
 	                	return runningActivityList;
 	                } ).build();
