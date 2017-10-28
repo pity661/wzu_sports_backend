@@ -90,6 +90,14 @@ public class TokenServiceImpl implements TokenService {
 			resBody.obj = null;
 			
 			return HttpServletResponse.SC_UNAUTHORIZED;
+		} else if (user.getUserType() != 2) {
+		    logMsg = "用户不具备当前操作权限";
+            logger.error(logMsg);
+            
+            resBody.statusMsg = logMsg;
+            resBody.obj = null;
+            
+            return HttpServletResponse.SC_FORBIDDEN;
 		}
 		
 		ClientWechatInfoExample clientWechatInfoExample = new ClientWechatInfoExample();
@@ -148,7 +156,6 @@ public class TokenServiceImpl implements TokenService {
 				deviceMapper.insertSelective(device);
 //			}
 //		}
-		
 		
 		DeviceLoginLog log = new DeviceLoginLog();
 		log.setDeviceId(deviceId);
