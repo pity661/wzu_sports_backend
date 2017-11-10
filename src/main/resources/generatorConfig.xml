@@ -19,60 +19,56 @@
       <property name="forceBigDecimals" value="false" />
     </javaTypeResolver>
 
-    <javaModelGenerator targetPackage="com.wzsport.model" targetProject="wzsport-server">
+    <javaModelGenerator targetPackage="com.wzsport.model" targetProject="wzu_sports_backend">
     </javaModelGenerator>
 
-    <sqlMapGenerator targetPackage="com.wzsport.mapper"  targetProject="wzsport-server">
+    <sqlMapGenerator targetPackage="com.wzsport.mapper"  targetProject="wzu_sports_backend">
     </sqlMapGenerator>
 
-    <javaClientGenerator type="MIXEDMAPPER" targetPackage="com.wzsport.mapper"  targetProject="wzsport-server">
+    <javaClientGenerator type="MIXEDMAPPER" targetPackage="com.wzsport.mapper"  targetProject="wzu_sports_backend">
     </javaClientGenerator>
 
-    <table schema="wzpsort" tableName="wzsport_user" domainObjectName ="User" >
+    <table schema="wzsport" tableName="wzsport_user" domainObjectName ="User" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
     </table>
 
-    <table schema="wzpsort" tableName="wzsport_role" domainObjectName ="Role" >
+	<table schema="wzsport" tableName="wzsport_university" domainObjectName ="University" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
     </table>
 
-	<table schema="wzpsort" tableName="wzsport_university" domainObjectName ="University" >
+    <table schema="wzsport" tableName="wzsport_college" domainObjectName ="College" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
     </table>
 
-    <table schema="wzpsort" tableName="wzsport_college" domainObjectName ="College" >
+    <table schema="wzsport" tableName="wzsport_major" domainObjectName ="Major" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
     </table>
 
-    <table schema="wzpsort" tableName="wzsport_major" domainObjectName ="Major" >
-      <generatedKey column="id" sqlStatement="MySql" identity="true" />
-    </table>
-
-    <table schema="wzpsort" tableName="wzsport_class" domainObjectName ="Class" >
+    <table schema="wzsport" tableName="wzsport_class" domainObjectName ="Class" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <columnOverride column="grade" javaType="java.lang.Integer"/>
     </table>
 
-    <table schema="wzpsort" tableName="wzsport_student" domainObjectName ="Student" >
+    <table schema="wzsport" tableName="wzsport_student" domainObjectName ="Student" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <columnOverride column="is_man" property="man" javaType="java.lang.Boolean"/>
     </table>
 
-    <table schema="wzpsort" tableName="wzsport_teacher" domainObjectName ="Teacher" >
+    <table schema="wzsport" tableName="wzsport_teacher" domainObjectName ="Teacher" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <columnOverride column="is_man" property="man" javaType="java.lang.Boolean"/>
     </table>
 
-    <table schema="wzpsort" tableName="wzsport_term" domainObjectName ="Term" >
+    <table schema="wzsport" tableName="wzsport_term" domainObjectName ="Term" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
     </table>
 
-    <table schema="wzpsort" tableName="wzsport_term_sports_task" domainObjectName ="TermSportsTask" >
+    <table schema="wzsport" tableName="wzsport_term_sports_task" domainObjectName ="TermSportsTask" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <columnOverride column="target_sports_times" javaType="java.lang.Integer"/>
     </table>
 
-    <table schema="wzpsort" tableName="wzsport_running_activity" domainObjectName ="RunningActivity" >
+    <table schema="wzsport" tableName="wzsport_running_activity" domainObjectName ="RunningActivity" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <columnOverride column="qualified" property="qualified" javaType="java.lang.Boolean"/>
       <columnOverride column="is_valid" property="isValid" javaType="java.lang.Boolean"/>
@@ -83,13 +79,13 @@
       <columnOverride column="ended_by" javaType="java.lang.Boolean"/>
     </table>
 
-    <table schema="wzpsort" tableName="wzsport_area_activity" domainObjectName ="AreaActivity" >
+    <table schema="wzsport" tableName="wzsport_area_activity" domainObjectName ="AreaActivity" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <columnOverride column="qualified" property="qualified" javaType="java.lang.Boolean"/>
       <columnOverride column="ended_by" javaType="java.lang.Boolean"/>
     </table>
 
-    <table schema="wzpsort" tableName="wzsport_running_sport" domainObjectName ="RunningSport" >
+    <table schema="wzsport" tableName="wzsport_running_sport" domainObjectName ="RunningSport" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <columnOverride column="is_enabled" javaType="java.lang.Boolean"/>
       <columnOverride column="is_man" javaType="java.lang.Boolean"/>
@@ -98,7 +94,7 @@
       <!-- <columnOverride column="acquisition_interval" javaType="java.lang.Integer"/> -->
     </table>
 
-    <table schema="wzpsort" tableName="wzsport_sport_score" domainObjectName ="SportScore" >
+    <table schema="wzsport" tableName="wzsport_sport_score" domainObjectName ="SportScore" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <columnOverride column="meter50_sprint_time" javaType="java.lang.Double"/>
       <columnOverride column="meter50_sprint_score" javaType="java.lang.Integer"/>
@@ -110,12 +106,12 @@
       <columnOverride column="abdominal_curl_score" javaType="java.lang.Integer"/>
     </table>
 
-    <table schema="wzpsort" tableName="wzsport_fitness_check_data" domainObjectName ="FitnessCheckData" >
+    <table schema="wzsport" tableName="wzsport_fitness_check_data" domainObjectName ="FitnessCheckData" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <columnOverride column="bmi" property="bmi" javaType="java.lang.Double"/>
     </table>
 
-    <table schema="wzpsort" tableName="wzsport_running_activity_data" domainObjectName ="RunningActivityData" >
+    <table schema="wzsport" tableName="wzsport_running_activity_data" domainObjectName ="RunningActivityData" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <columnOverride column="step_count" javaType="java.lang.Integer"/>
       <columnOverride column="distance" javaType="java.lang.Integer"/>
@@ -127,7 +123,7 @@
       <columnOverride column="is_normal" javaType="java.lang.Boolean"/>
     </table>
 
-     <table schema="wzpsort" tableName="wzsport_area_activity_data" domainObjectName ="AreaActivityData" >
+     <table schema="wzsport" tableName="wzsport_area_activity_data" domainObjectName ="AreaActivityData" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <columnOverride column="longitude" javaType="java.lang.Double"/>
       <columnOverride column="latitude" javaType="java.lang.Double"/>
@@ -135,20 +131,20 @@
       <columnOverride column="location_type" javaType="java.lang.Integer"/>
     </table>
 
-    <table schema="wzpsort" tableName="wzsport_client_version" domainObjectName ="ClientVersion" >
+    <table schema="wzsport" tableName="wzsport_client_version" domainObjectName ="ClientVersion" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <columnOverride column="is_forced" javaType="java.lang.Boolean"/>
       <columnOverride column="is_published" javaType="java.lang.Boolean"/>
     </table>
 
-    <table schema="wzpsort" tableName="wzsport_fix_location_outdoor_sport_point" domainObjectName ="FixLocationOutdoorSportPoint" >
+    <table schema="wzsport" tableName="wzsport_fix_location_outdoor_sport_point" domainObjectName ="FixLocationOutdoorSportPoint" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <columnOverride column="is_enabled" javaType="java.lang.Boolean"/>
       <ignoreColumn column="created_at"/>
       <ignoreColumn column="updated_at"/>
     </table>
 
-    <table schema="wzpsort" tableName="wzsport_area_sport" domainObjectName ="AreaSport" >
+    <table schema="wzsport" tableName="wzsport_area_sport" domainObjectName ="AreaSport" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <columnOverride column="is_enabled" javaType="java.lang.Boolean"/>
       <columnOverride column="is_man" javaType="java.lang.Boolean"/>
@@ -156,25 +152,25 @@
       <ignoreColumn column="updated_at"/>
     </table>
 
-    <table schema="wzpsort" tableName="wzsport_device" domainObjectName ="Device" >
+    <table schema="wzsport" tableName="wzsport_device" domainObjectName ="Device" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <ignoreColumn column="created_at"/>
       <ignoreColumn column="updated_at"/>
     </table>
 
-     <table schema="wzpsort" tableName="wzsport_device_login_log" domainObjectName ="DeviceLoginLog" >
+     <table schema="wzsport" tableName="wzsport_device_login_log" domainObjectName ="DeviceLoginLog" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <ignoreColumn column="created_at"/>
       <ignoreColumn column="updated_at"/>
     </table>
 
-    <table schema="wzpsort" tableName="wzsport_client_wechat_info" domainObjectName ="ClientWechatInfo" >
+    <table schema="wzsport" tableName="wzsport_client_wechat_info" domainObjectName ="ClientWechatInfo" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <ignoreColumn column="created_at"/>
       <ignoreColumn column="updated_at"/>
     </table>
 
-    <table schema="wzpsort" tableName="wzsport_sport_data_validate_rule" domainObjectName ="SportDataValidateRule" >
+    <table schema="wzsport" tableName="wzsport_sport_data_validate_rule" domainObjectName ="SportDataValidateRule" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <columnOverride column="speed" javaType="java.lang.Double"/>
       <columnOverride column="step_per_second" javaType="java.lang.Double"/>
@@ -183,22 +179,49 @@
       <ignoreColumn column="updated_at"/>
     </table>
 
-    <table schema="wzpsort" tableName="wzsport_sign_in" domainObjectName ="SignIn" >
+    <table schema="wzsport" tableName="wzsport_sign_in" domainObjectName ="SignIn" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <ignoreColumn column="created_at"/>
       <ignoreColumn column="updated_at"/>
     </table>
 
-    <table schema="wzpsort" tableName="wzsport_wechat_user" domainObjectName ="WechatUser" >
+    <table schema="wzsport" tableName="wzsport_wechat_user" domainObjectName ="WechatUser" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <ignoreColumn column="created_at"/>
       <ignoreColumn column="updated_at"/>
     </table>
 
-    <table schema="wzpsort" tableName="wzsport_student_sport_consume_statistic" domainObjectName ="StudentSportConsumeStatistic" >
+    <table schema="wzsport" tableName="wzsport_student_sport_consume_statistic" domainObjectName ="StudentSportConsumeStatistic" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <ignoreColumn column="created_at"/>
       <ignoreColumn column="updated_at"/>
+    </table>
+    
+    <table schema="wzsport" tableName="wzsport_role" domainObjectName ="Role" >
+      <generatedKey column="id" sqlStatement="MySql" identity="true" />
+      <ignoreColumn column="created_at"/>
+      <ignoreColumn column="updated_at"/>
+    </table>
+    
+    <table schema="wzsport" tableName="wzsport_user_role" domainObjectName ="UserRole" >
+      <generatedKey column="id" sqlStatement="MySql" identity="true" />
+    </table>
+    
+    <table schema="wzsport" tableName="wzsport_privilege" domainObjectName ="Privilege" >
+      <generatedKey column="id" sqlStatement="MySql" identity="true" />
+      <ignoreColumn column="created_at"/>
+      <ignoreColumn column="updated_at"/>
+    </table>
+    
+    <table schema="wzsport" tableName="wzsport_running_activity_view" domainObjectName ="RunningActivityView" >
+      <generatedKey column="id" sqlStatement="MySql" identity="true" />
+      <columnOverride column="qualified" property="qualified" javaType="java.lang.Boolean"/>
+      <columnOverride column="is_valid" property="isValid" javaType="java.lang.Boolean"/>
+      <columnOverride column="step_count" javaType="java.lang.Integer"/>
+      <columnOverride column="speed" javaType="java.lang.Double"/>
+      <columnOverride column="step_per_second" javaType="java.lang.Double"/>
+      <columnOverride column="distance_per_step" javaType="java.lang.Double"/>
+      <columnOverride column="ended_by" javaType="java.lang.Boolean"/>
     </table>
   </context>
 </generatorConfiguration>

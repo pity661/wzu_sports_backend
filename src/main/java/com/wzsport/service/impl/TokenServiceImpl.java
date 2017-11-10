@@ -90,7 +90,7 @@ public class TokenServiceImpl implements TokenService {
 			resBody.obj = null;
 			
 			return HttpServletResponse.SC_UNAUTHORIZED;
-		} else if (user.getUserType() != 2) {
+		} /*else if (user.getUserType() != 2) {
 		    logMsg = "用户不具备当前操作权限";
             logger.error(logMsg);
             
@@ -98,7 +98,7 @@ public class TokenServiceImpl implements TokenService {
             resBody.obj = null;
             
             return HttpServletResponse.SC_FORBIDDEN;
-		}
+		}*/
 		
 		ClientWechatInfoExample clientWechatInfoExample = new ClientWechatInfoExample();
 		clientWechatInfoExample.createCriteria().andUserIdEqualTo(user.getId());
