@@ -12,6 +12,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.wzsport.mapper.AreaActivityDataMapper;
 import com.wzsport.mapper.AreaActivityMapper;
+import com.wzsport.mapper.AreaActivityViewMapper;
 import com.wzsport.mapper.AreaSportMapper;
 import com.wzsport.mapper.FixLocationOutdoorSportPointMapper;
 import com.wzsport.mapper.StudentMapper;
@@ -19,6 +20,8 @@ import com.wzsport.model.AreaActivity;
 import com.wzsport.model.AreaActivityDataExample;
 import com.wzsport.model.AreaActivityExample;
 import com.wzsport.model.AreaActivityExample.Criteria;
+import com.wzsport.model.AreaActivityView;
+import com.wzsport.model.AreaActivityViewExample;
 import com.wzsport.model.FixLocationOutdoorSportPoint;
 import com.wzsport.model.Student;
 import com.wzsport.model.StudentExample;
@@ -39,6 +42,7 @@ import graphql.schema.GraphQLTypeReference;
 public class AreaActivityType {
 	
 	private static AreaActivityMapper areaActivityMapper;
+	private static AreaActivityViewMapper areaActivityViewMapper;
 	private static AreaActivityDataMapper areaActivityDataMapper;
 	private static AreaSportMapper AreaSportMapper;
 	private static StudentMapper studentMapper;
@@ -91,7 +95,7 @@ public class AreaActivityType {
                             .description("运动场所信息")
                             .type(FixLocationOutdoorSportPointType.getType())
                             .dataFetcher(environment -> {
-                                AreaActivity areaActivity = environment.getSource();
+                                AreaActivityView areaActivity = environment.getSource();
                                 FixLocationOutdoorSportPoint point = fixLocationOutdoorSportPointMapper.selectByPrimaryKey(areaActivity.getLocationId());
                                 return point;
                             })
@@ -106,7 +110,7 @@ public class AreaActivityType {
 							.description("运动日期")
 							.type(Scalars.GraphQLString)
 							.dataFetcher(environment ->  {
-								AreaActivity areaActivity = environment.getSource();
+								AreaActivityView areaActivity = environment.getSource();
 								SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 						        return sdf.format(areaActivity.getStartTime());
 							} )
@@ -116,8 +120,8 @@ public class AreaActivityType {
 							.description("活动开始时间,时间戳格式(毫秒)")
 							.type(Scalars.GraphQLLong)
 							.dataFetcher(environment ->  {
-								AreaActivity AreaActivity = environment.getSource();
-			                	return AreaActivity.getStartTime().getTime();
+								AreaActivityView areaActivity = environment.getSource();
+			                	return areaActivity.getStartTime().getTime();
 							} )
 							.build())
 					.field(GraphQLFieldDefinition.newFieldDefinition()
@@ -130,9 +134,9 @@ public class AreaActivityType {
 							.description("活动结束时间,时间戳格式(毫秒)")
 							.type(Scalars.GraphQLLong)
 							.dataFetcher(environment ->  {
-								AreaActivity AreaActivity = environment.getSource();
-								if (AreaActivity.getEndedAt() != null) {
-									return AreaActivity.getEndedAt().getTime();
+								AreaActivityView areaActivity = environment.getSource();
+								if (areaActivity.getEndedAt() != null) {
+									return areaActivity.getEndedAt().getTime();
 								} else {
 									return 0;
 								}
@@ -153,8 +157,8 @@ public class AreaActivityType {
 							.description("该活动所属的运动项目")
 							.type(AreaSportType.getType())
 							.dataFetcher(environment ->  {
-								AreaActivity AreaActivity = environment.getSource();
-			                	return AreaSportMapper.selectByPrimaryKey(AreaActivity.getAreaSportId());
+								AreaActivityView areaActivity = environment.getSource();
+			                	return AreaSportMapper.selectByPrimaryKey(areaActivity.getAreaSportId());
 							} )
 							.build())
 					.field(GraphQLFieldDefinition.newFieldDefinition()
@@ -162,8 +166,8 @@ public class AreaActivityType {
 							.description("该活动记录所属的学生")
 							.type(new GraphQLTypeReference("Student"))
 							.dataFetcher(environment ->  {
-								AreaActivity AreaActivity = environment.getSource();
-			                	return studentMapper.selectByPrimaryKey(AreaActivity.getStudentId());
+								AreaActivityView areaActivity = environment.getSource();
+			                	return studentMapper.selectByPrimaryKey(areaActivity.getStudentId());
 							} )
 							.build())
 					.field(GraphQLFieldDefinition.newFieldDefinition()
@@ -171,9 +175,9 @@ public class AreaActivityType {
 							.description("该活动记录的采集数据")
 							.type(new GraphQLList(AreaActivityDataType.getType()))
 							.dataFetcher(environment ->  {
-								AreaActivity AreaActivity = environment.getSource();
+								AreaActivityView areaActivity = environment.getSource();
 								AreaActivityDataExample example = new AreaActivityDataExample();
-								example.createCriteria().andActivityIdEqualTo(AreaActivity.getId());
+								example.createCriteria().andActivityIdEqualTo(areaActivity.getId());
 			                	return areaActivityDataMapper.selectByExample(example);
 							} )
 							.build())
@@ -218,6 +222,7 @@ public class AreaActivityType {
 	
 	public static GraphQLFieldDefinition getSearchField() {
 		return GraphQLFieldDefinition.newFieldDefinition()
+		            .argument(GraphQLArgument.newArgument().name("universityId").type(Scalars.GraphQLLong).build())
 	        		.argument(GraphQLArgument.newArgument().name("studentName").type(Scalars.GraphQLString).build())
 	        		.argument(GraphQLArgument.newArgument().name("studentNo").type(Scalars.GraphQLString).build())
 	        		.argument(GraphQLArgument.newArgument().name("startTime").type(Scalars.GraphQLLong).build())
@@ -231,9 +236,15 @@ public class AreaActivityType {
 														.build())
 	                .name("searchActivities")
 	                .dataFetcher(environment ->  {
-	                	
-	                	AreaActivityExample AreaActivityExample = new AreaActivityExample();
-	                	Criteria criteria = AreaActivityExample.createCriteria();
+	                    AreaActivityViewExample areaActivityExample = new AreaActivityViewExample();
+	                    com.wzsport.model.AreaActivityViewExample.Criteria criteria = areaActivityExample.createCriteria();
+	                    
+	                    Long universityId = environment.getArgument("universityId");
+	                	if (universityId == null) {
+	                	    return null;
+	                	}
+	                	criteria.andUniversityIdEqualTo(universityId);
+	                    
 	                	
 	                	String studentName = environment.getArgument("studentName");
 	                	if(studentName != null) {
@@ -282,9 +293,19 @@ public class AreaActivityType {
 	                		criteria.andStartTimeLessThanOrEqualTo(new Date(endTime));
 	                	}
 	                	
-	                	PageHelper.startPage(environment.getArgument("pageNumber"), environment.getArgument("pageSize"));
-	                	List<AreaActivity> areaActivityList = areaActivityMapper.selectByExample(AreaActivityExample);
-	                	return areaActivityList;
+	                	Integer pageNumber = environment.getArgument("pageNumber");
+	                	if (pageNumber == null) {
+	                	    pageNumber = 1;
+	                	}
+	                	
+	                	Integer pageSize = environment.getArgument("pageSize");
+                        if (pageSize == null) {
+                            pageSize = 10;
+                        }
+                        
+	                	PageHelper.startPage(pageNumber, pageSize);
+	                	List<AreaActivityView> list = areaActivityViewMapper.selectByExample(areaActivityExample);
+	                	return list;
 	                } ).build();
     }
 
@@ -292,6 +313,11 @@ public class AreaActivityType {
 	public void setAreaActivityMapper(AreaActivityMapper areaActivityMapper) {
 		AreaActivityType.areaActivityMapper = areaActivityMapper;
 	}
+	
+   @Autowired(required = true)
+    public void setAreaActivityViewMapper(AreaActivityViewMapper areaActivityViewMapper) {
+        AreaActivityType.areaActivityViewMapper = areaActivityViewMapper;
+    }
 	
 	@Autowired(required = true)
 	public void setAreaSportMapper(AreaSportMapper AreaSportMapper) {

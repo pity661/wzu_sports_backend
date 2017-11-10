@@ -276,14 +276,12 @@ public class RunningActivityType {
 														.build())
 	                .name("searchRunningActivities")
 	                .dataFetcher(environment ->  {
+	                    RunningActivityViewExample example = new RunningActivityViewExample();
+	                    com.wzsport.model.RunningActivityViewExample.Criteria criteria = example.createCriteria();
 	                    Long universityId = environment.getArgument("universityId");
 	                    if (universityId == null) {
 	                        return null;
 	                    }
-	                    
-	                	RunningActivityViewExample example = new RunningActivityViewExample();
-	                	com.wzsport.model.RunningActivityViewExample.Criteria criteria = example.createCriteria();
-	                	
 	                	criteria.andUniversityIdEqualTo(universityId);
 	                	
 	                	String studentName = environment.getArgument("studentName");
