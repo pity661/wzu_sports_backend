@@ -9,6 +9,7 @@ import com.github.pagehelper.PageHelper;
 import com.wzsport.mapper.CollegeMapper;
 import com.wzsport.mapper.TeacherMapper;
 import com.wzsport.mapper.UniversityMapper;
+import com.wzsport.mapper.UserMapper;
 import com.wzsport.model.College;
 import com.wzsport.model.CollegeExample;
 import com.wzsport.model.Student;
@@ -16,6 +17,7 @@ import com.wzsport.model.StudentExample;
 import com.wzsport.model.TeacherExample;
 import com.wzsport.model.University;
 import com.wzsport.model.UniversityExample;
+import com.wzsport.model.UserExample;
 import com.wzsport.service.TermService;
 
 import graphql.Scalars;
@@ -36,6 +38,7 @@ public class UniversityType {
 	private static UniversityMapper universityMapper;
 	private static CollegeMapper collegeMapper;
 	private static TeacherMapper teacherMapper;
+	private static UserMapper userMapper;
 	private static TermService termService;
 	private static GraphQLObjectType type;
 	private static GraphQLFieldDefinition singleQueryField;
@@ -106,6 +109,34 @@ public class UniversityType {
 			                	return femaleTeachersCount;
 							} )
 							.build())
+					.field(GraphQLFieldDefinition.newFieldDefinition()
+                            .name("activeStudentCount")
+                            .description("该大学中的激活学生总数")
+                            .type(Scalars.GraphQLInt)
+                            .dataFetcher(environment ->  {
+                                University university = environment.getSource();
+                                
+                                UserExample example = new UserExample();
+                                example.createCriteria().andUniversityIdEqualTo(university.getId()).andOpenIdNotEqualTo("");
+                                
+                                int count = (int) userMapper.countByExample(example);
+                                return count;
+                            } )
+                            .build())
+					.field(GraphQLFieldDefinition.newFieldDefinition()
+                            .name("studentCount")
+                            .description("该大学中的学生总数")
+                            .type(Scalars.GraphQLInt)
+                            .dataFetcher(environment ->  {
+                                University university = environment.getSource();
+                                
+                                UserExample example = new UserExample();
+                                example.createCriteria().andUniversityIdEqualTo(university.getId());
+                                
+                                int count = (int) userMapper.countByExample(example);
+                                return count;
+                            } )
+                            .build())
 					.field(GraphQLFieldDefinition.newFieldDefinition()
 							.name("kcalConsumptionRanking")
 							.description("该校的学生累计热量消耗量排行榜")
@@ -181,6 +212,11 @@ public class UniversityType {
 		}
 		return listField;
 	}
+	
+   @Autowired(required = true)
+    public void setUserMapper(UserMapper userMapper) {
+        UniversityType.userMapper = userMapper;
+    }
 
 	@Autowired(required = true)
 	public void setCollegeMapper(CollegeMapper collegeMapper) {

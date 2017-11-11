@@ -12,12 +12,15 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.wzsport.mapper.RunningActivityDataMapper;
 import com.wzsport.mapper.RunningActivityMapper;
+import com.wzsport.mapper.RunningActivityViewMapper;
 import com.wzsport.mapper.RunningSportMapper;
 import com.wzsport.mapper.StudentMapper;
 import com.wzsport.model.RunningActivity;
 import com.wzsport.model.RunningActivityDataExample;
 import com.wzsport.model.RunningActivityExample;
 import com.wzsport.model.RunningActivityExample.Criteria;
+import com.wzsport.model.RunningActivityView;
+import com.wzsport.model.RunningActivityViewExample;
 import com.wzsport.model.Student;
 import com.wzsport.model.StudentExample;
 
@@ -39,6 +42,7 @@ import graphql.schema.GraphQLTypeReference;
 public class RunningActivityType {
 	
 	private static RunningActivityMapper runningActivityMapper;
+	private static RunningActivityViewMapper runningActivityViewMapper;
 	private static RunningActivityDataMapper runningActivityDataMapper;
 	private static RunningSportMapper runningSportMapper;
 	private static StudentMapper studentMapper;
@@ -105,7 +109,7 @@ public class RunningActivityType {
 							.description("运动日期")
 							.type(Scalars.GraphQLString)
 							.dataFetcher(environment ->  {
-								RunningActivity runningActivity = environment.getSource();
+								RunningActivityView runningActivity = environment.getSource();
 								SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 						        return sdf.format(runningActivity.getStartTime());
 							} )
@@ -115,7 +119,7 @@ public class RunningActivityType {
 							.description("活动开始时间,时间戳格式(毫秒)")
 							.type(Scalars.GraphQLLong)
 							.dataFetcher(environment ->  {
-								RunningActivity runningActivity = environment.getSource();
+								RunningActivityView runningActivity = environment.getSource();
 			                	return runningActivity.getStartTime().getTime();
 							} )
 							.build())
@@ -124,7 +128,7 @@ public class RunningActivityType {
 							.description("活动结束时间,时间戳格式(毫秒)")
 							.type(Scalars.GraphQLLong)
 							.dataFetcher(environment ->  {
-								RunningActivity runningActivity = environment.getSource();
+								RunningActivityView runningActivity = environment.getSource();
 								if (runningActivity.getEndedAt() != null) {
 									return runningActivity.getEndedAt().getTime();
 								} else {
@@ -182,7 +186,7 @@ public class RunningActivityType {
 							.description("该活动所属的运动项目")
 							.type(RunningSportType.getType())
 							.dataFetcher(environment ->  {
-								RunningActivity runningActivity = environment.getSource();
+								RunningActivityView runningActivity = environment.getSource();
 			                	return runningSportMapper.selectByPrimaryKey(runningActivity.getRunningSportId());
 							} )
 							.build())
@@ -191,7 +195,7 @@ public class RunningActivityType {
 							.description("该活动记录所属的学生")
 							.type(new GraphQLTypeReference("Student"))
 							.dataFetcher(environment ->  {
-								RunningActivity runningActivity = environment.getSource();
+								RunningActivityView runningActivity = environment.getSource();
 			                	return studentMapper.selectByPrimaryKey(runningActivity.getStudentId());
 							} )
 							.build())
@@ -200,7 +204,7 @@ public class RunningActivityType {
 							.description("该活动记录的采集数据")
 							.type(new GraphQLList(RunningActivityDataType.getType()))
 							.dataFetcher(environment ->  {
-								RunningActivity runningActivity = environment.getSource();
+								RunningActivityView runningActivity = environment.getSource();
 								RunningActivityDataExample example = new RunningActivityDataExample();
 								example.createCriteria().andActivityIdEqualTo(runningActivity.getId());
 			                	return runningActivityDataMapper.selectByExample(example);
@@ -247,6 +251,7 @@ public class RunningActivityType {
 	
 	public static GraphQLFieldDefinition getSearchField() {
 		return GraphQLFieldDefinition.newFieldDefinition()
+		            .argument(GraphQLArgument.newArgument().name("universityId").type(Scalars.GraphQLLong).build())
 	        		.argument(GraphQLArgument.newArgument().name("studentName").type(Scalars.GraphQLString).build())
 	        		.argument(GraphQLArgument.newArgument().name("studentNo").type(Scalars.GraphQLString).build())
 	        		.argument(GraphQLArgument.newArgument().name("startTime").type(Scalars.GraphQLLong).build())
@@ -271,11 +276,16 @@ public class RunningActivityType {
 														.build())
 	                .name("searchRunningActivities")
 	                .dataFetcher(environment ->  {
-	                	RunningActivityExample runningActivityExample = new RunningActivityExample();
-	                	Criteria criteria = runningActivityExample.createCriteria();
+	                    RunningActivityViewExample example = new RunningActivityViewExample();
+	                    com.wzsport.model.RunningActivityViewExample.Criteria criteria = example.createCriteria();
+	                    Long universityId = environment.getArgument("universityId");
+	                    if (universityId == null) {
+	                        return null;
+	                    }
+	                	criteria.andUniversityIdEqualTo(universityId);
 	                	
 	                	String studentName = environment.getArgument("studentName");
-	                	if(studentName != null) {
+	                	if (studentName != null) {
 	                		StudentExample studentExample =  new StudentExample();
 	                		studentExample.createCriteria().andNameLike("%" + studentName + "%");
 	                		List<Student> studentList = studentMapper.selectByExample(studentExample);
@@ -291,7 +301,7 @@ public class RunningActivityType {
 	                	}
 	                	
 	                	String studentNo = environment.getArgument("studentNo");
-	                	if(studentNo != null) {
+	                	if (studentNo != null) {
 	                		StudentExample studentExample =  new StudentExample();
 	                		studentExample.createCriteria().andStudentNoLike("%" + studentNo + "%");
 	                		List<Student> studentList = studentMapper.selectByExample(studentExample);
@@ -307,22 +317,22 @@ public class RunningActivityType {
 	                	}
 	                	
 	                	Long runningSportId = environment.getArgument("runningSportId");
-	                	if(runningSportId != null) {
+	                	if (runningSportId != null) {
 	                		criteria.andRunningSportIdEqualTo(runningSportId);
 	                	}
 	                	
 	                	Long startTime = environment.getArgument("startTime");
-	                	if(startTime != null) {
+	                	if (startTime != null) {
 	                		criteria.andStartTimeGreaterThanOrEqualTo(new Date(startTime));
 	                	}
 	                	
 	                	Long endTime = environment.getArgument("endTime");
-	                	if(endTime != null) {
+	                	if (endTime != null) {
 	                		criteria.andStartTimeLessThanOrEqualTo(new Date(endTime));
 	                	}
 	                	
 	                	Double speed = environment.getArgument("speed");
-	                	if(speed != null) {
+	                	if (speed != null) {
 	                		
 	                		switch(Operator.valueOf(environment.getArgument("speedOperator"))) {
 							case BETWEEN:
@@ -344,7 +354,7 @@ public class RunningActivityType {
 	                	}
 	                	
 	                	Double stepPerSecond = environment.getArgument("stepPerSecond");
-	                	if(stepPerSecond != null) {
+	                	if (stepPerSecond != null) {
 	                		
 	                		switch(Operator.valueOf(environment.getArgument("stepPerSecondOperator"))) {
 							case BETWEEN:
@@ -366,7 +376,7 @@ public class RunningActivityType {
 	                	}
 	                	
 	                	Double distancePerStep = environment.getArgument("distancePerStep");
-	                	if(distancePerStep != null) {
+	                	if (distancePerStep != null) {
 	                		
 	                		switch(Operator.valueOf(environment.getArgument("distancePerStepOperator"))) {
 							case BETWEEN:
@@ -397,10 +407,19 @@ public class RunningActivityType {
 	                		criteria.andIsValidEqualTo(isValid);
 	                	}
 	                	
-	                	PageHelper.startPage(environment.getArgument("pageNumber"), environment.getArgument("pageSize"));
-	                	runningActivityExample.setOrderByClause("start_time desc");
-	                	List<RunningActivity> runningActivityList = runningActivityMapper.selectByExample(runningActivityExample);
-	                	return runningActivityList;
+	                	Integer pageNumber = environment.getArgument("pageNumber");
+	                	if (pageNumber == null) {
+	                	    pageNumber = 1;
+	                	}
+	                	
+	                	Integer pageSize = environment.getArgument("pageSize");
+	                	if (pageSize == null) {
+	                	    pageSize = 10;
+	                	}
+	                	PageHelper.startPage(pageNumber, pageSize);
+	                	example.setOrderByClause("start_time desc");
+	                	List<RunningActivityView> list = runningActivityViewMapper.selectByExample(example);
+	                	return list;
 	                } ).build();
     }
 
@@ -423,4 +442,9 @@ public class RunningActivityType {
 	public void setRunningActivityDataMapper(RunningActivityDataMapper runningActivityDataMapper) {
 		RunningActivityType.runningActivityDataMapper = runningActivityDataMapper;
 	}
+	
+    @Autowired(required = true)
+    public void setRunningActivityViewMapper(RunningActivityViewMapper runningActivityViewMapper) {
+        RunningActivityType.runningActivityViewMapper = runningActivityViewMapper;
+    }
 }
