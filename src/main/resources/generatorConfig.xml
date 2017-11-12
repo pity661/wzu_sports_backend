@@ -6,7 +6,7 @@
 <generatorConfiguration>
 
   <!-- 根据本地环境填写JDBC驱动包的路径 -->
-  <classPathEntry location="/Users/chaiyu/mysql-connector-java-5.1.43/mysql-connector-java-5.1.43-bin.jar" />
+  <classPathEntry location="C:/Users/mysql-connector-java-5.1.44/mysql-connector-java-5.1.44-bin.jar" />
 
   <context id="wzsport" targetRuntime="MyBatis3">
     <jdbcConnection driverClass="com.mysql.jdbc.Driver"
@@ -228,6 +228,12 @@
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <columnOverride column="qualified" property="qualified" javaType="java.lang.Boolean"/>
       <columnOverride column="ended_by" javaType="java.lang.Boolean"/>
+    </table>
+    
+    <table schema="wzsport" tableName="wzsport_physical_fitness_test" domainObjectName ="PhysicalFitnessTest" >
+      <generatedKey column="id" sqlStatement="MySql" identity="true" />
+      <ignoreColumn column="created_at"/>
+      <ignoreColumn column="updated_at"/>
     </table>
   </context>
 </generatorConfiguration>

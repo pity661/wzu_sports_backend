@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import com.github.pagehelper.PageHelper;
 import com.wzsport.mapper.AreaActivityMapper;
 import com.wzsport.mapper.FitnessCheckDataMapper;
+import com.wzsport.mapper.PhysicalFitnessTestMapper;
 import com.wzsport.mapper.RunningActivityMapper;
 import com.wzsport.mapper.SportScoreMapper;
 import com.wzsport.mapper.StudentMapper;
@@ -19,6 +20,8 @@ import com.wzsport.model.AreaActivity;
 import com.wzsport.model.AreaActivityExample;
 import com.wzsport.model.FitnessCheckData;
 import com.wzsport.model.FitnessCheckDataExample;
+import com.wzsport.model.PhysicalFitnessTest;
+import com.wzsport.model.PhysicalFitnessTestExample;
 import com.wzsport.model.RunningActivity;
 import com.wzsport.model.RunningActivityExample;
 import com.wzsport.model.SportScore;
@@ -52,7 +55,8 @@ public class StudentType {
 	private static StudentMapper studentMapper;
 	private static FitnessCheckDataMapper fitnessCheckDataMapper;
 	private static RunningActivityMapper runningActivityMapper;
-
+	private static PhysicalFitnessTestMapper physicalFitnessTestMapper;
+	
 	private static AreaActivityMapper areaActivityMapper;
 	private static SportScoreMapper sportScoreMapper;
 	private static GraphQLObjectType type;
@@ -106,7 +110,8 @@ public class StudentType {
 					.field(GraphQLFieldDefinition.newFieldDefinition().name("fitnessCheckData")
 							.description("该学生指定学期的体测数据")
 							.argument(GraphQLArgument.newArgument().name("termId").type(Scalars.GraphQLLong).build())
-							.type(FitnessCheckDataType.getType()).dataFetcher(environment -> {
+							.type(FitnessCheckDataType.getType())
+							.dataFetcher(environment -> {
 								Long termId = environment.getArgument("termId");
 								Student student = environment.getSource();
 								FitnessCheckDataExample fitnessCheckDataExample = new FitnessCheckDataExample();
@@ -116,6 +121,21 @@ public class StudentType {
 										.selectByExample(fitnessCheckDataExample);
 								if (fitnessCheckDataList.size() != 0) {
 									return fitnessCheckDataList.get(0);
+								}
+								return null;
+							}).build())
+					.field(GraphQLFieldDefinition.newFieldDefinition().name("physicalFitnessTest")
+							.description("该学生的所有体测数据取第一条")
+							//.type(new GraphQLList(PhysicalFitnessTestType.getType()))
+							.type(PhysicalFitnessTestType.getType())
+							.dataFetcher(environment -> {
+								Student student = environment.getSource();
+								PhysicalFitnessTestExample physicalFitnessTestExample = new PhysicalFitnessTestExample();
+								physicalFitnessTestExample.createCriteria().andStudentNoEqualTo(student.getStudentNo());
+								List<PhysicalFitnessTest> physicalFitnessTestList = physicalFitnessTestMapper.selectByExample(physicalFitnessTestExample);
+								if (physicalFitnessTestList.size() != 0) {
+									System.out.println(physicalFitnessTestList.size());
+									return physicalFitnessTestList.get(0);
 								}
 								return null;
 							}).build())
@@ -824,14 +844,16 @@ public class StudentType {
 
 	public static GraphQLFieldDefinition getListQueryByConditionsField() {
 		if (listQueryByConditionsField == null) {
+			
 			listQueryByConditionsField = GraphQLFieldDefinition.newFieldDefinition()
+					.argument(GraphQLArgument.newArgument().name("universityId").type(Scalars.GraphQLLong).build())
 					.argument(GraphQLArgument.newArgument().name("classId").type(Scalars.GraphQLLong).build())
 					.argument(GraphQLArgument.newArgument().name("name").type(Scalars.GraphQLString).build())
 					.argument(GraphQLArgument.newArgument().name("studentNo").type(Scalars.GraphQLString).build())
 					.argument(GraphQLArgument.newArgument().name("isMan").type(Scalars.GraphQLBoolean).build())
 					.argument(GraphQLArgument.newArgument().name("pageNumber").type(Scalars.GraphQLInt).build())
 					.argument(GraphQLArgument.newArgument().name("pageSize").type(Scalars.GraphQLInt).build())
-					.type(PageType.getPageTypeBuidler(getType()).name("StudentPage").description("学生类型分页").build())
+					.type(new GraphQLList(getType()))
 					.name("searchStudents").description("搜索学生").dataFetcher(environment -> {
 						Long classId = environment.getArgument("classId");
 						String name = environment.getArgument("name");
@@ -903,4 +925,11 @@ public class StudentType {
 	public void setAreaActivityService(AreaActivityService areaActivityService) {
 		StudentType.areaActivityService = areaActivityService;
 	}
+	
+	@Autowired(required = true)
+	public void setPhysicalFitnessTestMapper(PhysicalFitnessTestMapper physicalFitnessTestMapper) {
+		StudentType.physicalFitnessTestMapper = physicalFitnessTestMapper;
+	}
+	
+	
 }
