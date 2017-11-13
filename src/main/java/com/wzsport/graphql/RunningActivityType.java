@@ -204,7 +204,7 @@ public class RunningActivityType {
 							.description("该活动记录的采集数据")
 							.type(new GraphQLList(RunningActivityDataType.getType()))
 							.dataFetcher(environment ->  {
-								RunningActivityView runningActivity = environment.getSource();
+								RunningActivity runningActivity = environment.getSource();
 								RunningActivityDataExample example = new RunningActivityDataExample();
 								example.createCriteria().andActivityIdEqualTo(runningActivity.getId());
 			                	return runningActivityDataMapper.selectByExample(example);
