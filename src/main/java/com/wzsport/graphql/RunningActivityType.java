@@ -204,7 +204,7 @@ public class RunningActivityType {
 							.description("该活动记录的采集数据")
 							.type(new GraphQLList(RunningActivityDataType.getType()))
 							.dataFetcher(environment ->  {
-								RunningActivity runningActivity = environment.getSource();
+								RunningActivityView runningActivity = environment.getSource();
 								RunningActivityDataExample example = new RunningActivityDataExample();
 								example.createCriteria().andActivityIdEqualTo(runningActivity.getId());
 			                	return runningActivityDataMapper.selectByExample(example);
@@ -224,8 +224,15 @@ public class RunningActivityType {
 	                .type(getType())
 	                .dataFetcher(environment ->  {
 	                	long id = environment.getArgument("id");
-	                	RunningActivity runningActivity = runningActivityMapper.selectByPrimaryKey(id);
-	                	return runningActivity;
+	                	RunningActivityViewExample example = new RunningActivityViewExample();
+	                	example.createCriteria().andIdEqualTo(id);
+	                	List<RunningActivityView> list = runningActivityViewMapper.selectByExample(example);
+	                	if (list.size() > 0) {
+	                		return list.get(0);
+	                	} else {
+	                		return null;
+	                	}
+	                	 
 	                } ).build();
 		}
         return singleQueryField;
@@ -240,9 +247,9 @@ public class RunningActivityType {
 	                .type(new GraphQLList(getType()))
 	                .dataFetcher(environment ->  {
 	                	long studentId = environment.getArgument("studentId");
-	                	RunningActivityExample runningActivityExample = new RunningActivityExample();
-	                	runningActivityExample.createCriteria().andStudentIdEqualTo(studentId);
-	                	List<RunningActivity> runningActivityList = runningActivityMapper.selectByExample(runningActivityExample);
+	                	RunningActivityViewExample example = new RunningActivityViewExample();
+	                	example.createCriteria().andStudentIdEqualTo(studentId);
+	                	List<RunningActivityView> runningActivityList = runningActivityViewMapper.selectByExample(example);
 	                	return runningActivityList;
 	                } ).build();
 		}

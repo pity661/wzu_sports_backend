@@ -175,7 +175,7 @@ public class AreaActivityType {
 							.description("该活动记录的采集数据")
 							.type(new GraphQLList(AreaActivityDataType.getType()))
 							.dataFetcher(environment ->  {
-								AreaActivityView areaActivity = environment.getSource();
+								AreaActivity areaActivity = environment.getSource();
 								AreaActivityDataExample example = new AreaActivityDataExample();
 								example.createCriteria().andActivityIdEqualTo(areaActivity.getId());
 			                	return areaActivityDataMapper.selectByExample(example);
@@ -211,9 +211,9 @@ public class AreaActivityType {
 	                .type(new GraphQLList(getType()))
 	                .dataFetcher(environment ->  {
 	                	long studentId = environment.getArgument("studentId");
-	                	AreaActivityExample AreaActivityExample = new AreaActivityExample();
-	                	AreaActivityExample.createCriteria().andStudentIdEqualTo(studentId);
-	                	List<AreaActivity> areaActivityList = areaActivityMapper.selectByExample(AreaActivityExample);
+	                	AreaActivityViewExample example = new AreaActivityViewExample();
+	                	example.createCriteria().andStudentIdEqualTo(studentId);
+	                	List<AreaActivityView> areaActivityList = areaActivityViewMapper.selectByExample(example);
 	                	return areaActivityList;
 	                } ).build();
 		}
