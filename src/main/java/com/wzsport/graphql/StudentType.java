@@ -853,7 +853,10 @@ public class StudentType {
 					.argument(GraphQLArgument.newArgument().name("isMan").type(Scalars.GraphQLBoolean).build())
 					.argument(GraphQLArgument.newArgument().name("pageNumber").type(Scalars.GraphQLInt).build())
 					.argument(GraphQLArgument.newArgument().name("pageSize").type(Scalars.GraphQLInt).build())
-					.type(new GraphQLList(getType()))
+					.type(PageType.getPageTypeBuidler(getType())
+							.name("StudentsPage")
+							.description("活动记录分页")
+							.build())
 					.name("searchStudents").description("搜索学生").dataFetcher(environment -> {
 						Long classId = environment.getArgument("classId");
 						String name = environment.getArgument("name");
