@@ -230,10 +230,18 @@
       <columnOverride column="ended_by" javaType="java.lang.Boolean"/>
     </table>
     
+    <table schema="wzsport" tableName="wzsport_student_user_view" domainObjectName ="StudentUserView" >
+      <generatedKey column="id" sqlStatement="MySql" identity="true" />
+      <columnOverride column="is_man" property="isMan" javaType="java.lang.Boolean"/>
+    </table>
+    
     <table schema="wzsport" tableName="wzsport_physical_fitness_test" domainObjectName ="PhysicalFitnessTest" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
+      <columnOverride column="is_man" property="isMan" javaType="java.lang.Boolean"/>
       <ignoreColumn column="created_at"/>
       <ignoreColumn column="updated_at"/>
     </table>
+    
+    
   </context>
 </generatorConfiguration>
