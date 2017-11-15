@@ -6,15 +6,16 @@ import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
 @Component
-public class StudentUserType {
+public class StudentStatisticType {
 	private static GraphQLObjectType type;
-	public StudentUserType(){}
+	
+	public StudentStatisticType(){}
 	
 	public static GraphQLObjectType getType() {
 		if(type == null) {
 			type = GraphQLObjectType.newObject()
-					.name("StudentUser")
-					.description("学生和用户之间关系")
+					.name("StudentStatistic")
+					.description("学生和注册之间关系")
 					.field(GraphQLFieldDefinition.newFieldDefinition()
 							.name("className")
 							.description("班级名称")
@@ -46,9 +47,29 @@ public class StudentUserType {
 							.type(Scalars.GraphQLString)
 							.build())
 					.field(GraphQLFieldDefinition.newFieldDefinition()
-							.name("cardNum")
+							.name("signInCount")
 							.description("打卡次数")
-							.type(Scalars.GraphQLInt)
+							.type(Scalars.GraphQLLong)
+							.build())
+					.field(GraphQLFieldDefinition.newFieldDefinition()
+							.name("runningActivityCount")
+							.description("跑步运动次数")
+							.type(Scalars.GraphQLLong)
+							.build())
+					.field(GraphQLFieldDefinition.newFieldDefinition()
+							.name("areaActivityCount")
+							.description("区域运动次数")
+							.type(Scalars.GraphQLLong)
+							.build())
+					.field(GraphQLFieldDefinition.newFieldDefinition()
+							.name("runningActivityQualifiedCount")
+							.description("跑步达标运动次数")
+							.type(Scalars.GraphQLLong)
+							.build())
+					.field(GraphQLFieldDefinition.newFieldDefinition()
+							.name("areaActivityQualifiedCount")
+							.description("区域达标运动次数")
+							.type(Scalars.GraphQLLong)
 							.build())
 					.build();
 		}

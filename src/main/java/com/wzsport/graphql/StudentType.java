@@ -16,7 +16,6 @@ import com.wzsport.mapper.PhysicalFitnessTestMapper;
 import com.wzsport.mapper.RunningActivityMapper;
 import com.wzsport.mapper.SportScoreMapper;
 import com.wzsport.mapper.StudentMapper;
-import com.wzsport.mapper.StudentUserViewMapper;
 import com.wzsport.model.AreaActivity;
 import com.wzsport.model.AreaActivityExample;
 import com.wzsport.model.FitnessCheckData;
@@ -29,8 +28,6 @@ import com.wzsport.model.SportScore;
 import com.wzsport.model.SportScoreExample;
 import com.wzsport.model.Student;
 import com.wzsport.model.StudentExample;
-import com.wzsport.model.StudentUserView;
-import com.wzsport.model.StudentUserViewExample;
 import com.wzsport.model.StudentExample.Criteria;
 import com.wzsport.model.Term;
 import com.wzsport.service.AreaActivityService;
@@ -56,7 +53,6 @@ public class StudentType {
 	private static AreaActivityService areaActivityService;
 
 	private static StudentMapper studentMapper;
-	private static StudentUserViewMapper studentUserViewMapper;
 	private static FitnessCheckDataMapper fitnessCheckDataMapper;
 	private static RunningActivityMapper runningActivityMapper;
 	private static PhysicalFitnessTestMapper physicalFitnessTestMapper;
@@ -934,11 +930,6 @@ public class StudentType {
 	@Autowired(required = true)
 	public void setPhysicalFitnessTestMapper(PhysicalFitnessTestMapper physicalFitnessTestMapper) {
 		StudentType.physicalFitnessTestMapper = physicalFitnessTestMapper;
-	}
-	
-	@Autowired(required = true)
-	public void setStudentUserViewMapper(StudentUserViewMapper studentUserViewMapper) {
-		StudentType.studentUserViewMapper = studentUserViewMapper;
 	}
 	
 	
