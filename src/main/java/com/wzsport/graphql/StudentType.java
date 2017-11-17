@@ -13,6 +13,7 @@ import com.github.pagehelper.PageHelper;
 import com.wzsport.mapper.AreaActivityMapper;
 import com.wzsport.mapper.FitnessCheckDataMapper;
 import com.wzsport.mapper.PhysicalFitnessTestMapper;
+import com.wzsport.mapper.RunningActivityDataStatisticMapper;
 import com.wzsport.mapper.RunningActivityMapper;
 import com.wzsport.mapper.SportScoreMapper;
 import com.wzsport.mapper.StudentMapper;
@@ -23,6 +24,8 @@ import com.wzsport.model.FitnessCheckDataExample;
 import com.wzsport.model.PhysicalFitnessTest;
 import com.wzsport.model.PhysicalFitnessTestExample;
 import com.wzsport.model.RunningActivity;
+import com.wzsport.model.RunningActivityDataStatistic;
+import com.wzsport.model.RunningActivityDataStatisticExample;
 import com.wzsport.model.RunningActivityExample;
 import com.wzsport.model.SportScore;
 import com.wzsport.model.SportScoreExample;
@@ -56,6 +59,7 @@ public class StudentType {
 	private static FitnessCheckDataMapper fitnessCheckDataMapper;
 	private static RunningActivityMapper runningActivityMapper;
 	private static PhysicalFitnessTestMapper physicalFitnessTestMapper;
+	private static RunningActivityDataStatisticMapper runningActivityDataStatisticMapper;
 	
 	private static AreaActivityMapper areaActivityMapper;
 	private static SportScoreMapper sportScoreMapper;
@@ -771,6 +775,23 @@ public class StudentType {
 								}
 								return areaActivityService.getQualifiedActivityCount(student.getId(), null, null);
 							}).build())
+					.field(GraphQLFieldDefinition.newFieldDefinition().name("runningActivityDataStatistic")
+					        .argument(GraphQLArgument.newArgument().name("pageNumber").type(Scalars.GraphQLInt).build())
+                            .argument(GraphQLArgument.newArgument().name("pageSize").type(Scalars.GraphQLInt).build())
+                            .argument(GraphQLArgument.newArgument().name("studentName").type(Scalars.GraphQLString).build())
+                            .argument(GraphQLArgument.newArgument().name("studentNo").type(Scalars.GraphQLString).build())
+                            .description("该学生跑步记录运动点统计")
+                            .type(PageType.getPageTypeBuidler(RunningActivityDataStatisticType.getType())
+                                    .name("RunningActivityDataStatisticInfoPage").description("学生跑步记录运动点统计信息分页").build())
+                            .dataFetcher(environment -> {
+                                Student student = environment.getSource();
+                                RunningActivityDataStatisticExample example = new RunningActivityDataStatisticExample();
+                                RunningActivityDataStatisticExample.Criteria  criteria = example.createCriteria();
+                                criteria.andStudentIdEqualTo(student.getId());
+                                PageHelper.startPage(environment.getArgument("pageNumber"), environment.getArgument("pageSize"));
+                                List<RunningActivityDataStatistic> list = runningActivityDataStatisticMapper.selectByExample(example);
+                                return list;
+                            }).build())
 					.build();
 		}
 
@@ -932,5 +953,8 @@ public class StudentType {
 		StudentType.physicalFitnessTestMapper = physicalFitnessTestMapper;
 	}
 	
-	
+    @Autowired(required = true)
+    public void setRunningActivityDataStatisticMapper(RunningActivityDataStatisticMapper runningActivityDataStatisticMapper) {
+        StudentType.runningActivityDataStatisticMapper = runningActivityDataStatisticMapper;
+    }
 }

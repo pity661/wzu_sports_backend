@@ -242,7 +242,11 @@
       <ignoreColumn column="updated_at"/>
     </table>
     
-    
+    <table schema="wzpsort" tableName="wzsport_running_activity_data_statistic" domainObjectName ="RunningActivityDataStatistic" >
+      <generatedKey column="id" sqlStatement="MySql" identity="true" />
+      <ignoreColumn column="created_at"/>
+      <ignoreColumn column="updated_at"/>
+    </table>
     
   </context>
 </generatorConfiguration>
