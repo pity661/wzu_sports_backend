@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.github.pagehelper.PageHelper;
+import com.wzsport.mapper.AreaActivityDataStatisticMapper;
 import com.wzsport.mapper.AreaActivityMapper;
 import com.wzsport.mapper.FitnessCheckDataMapper;
 import com.wzsport.mapper.PhysicalFitnessTestMapper;
@@ -18,6 +19,8 @@ import com.wzsport.mapper.RunningActivityMapper;
 import com.wzsport.mapper.SportScoreMapper;
 import com.wzsport.mapper.StudentMapper;
 import com.wzsport.model.AreaActivity;
+import com.wzsport.model.AreaActivityDataStatistic;
+import com.wzsport.model.AreaActivityDataStatisticExample;
 import com.wzsport.model.AreaActivityExample;
 import com.wzsport.model.FitnessCheckData;
 import com.wzsport.model.FitnessCheckDataExample;
@@ -60,6 +63,7 @@ public class StudentType {
 	private static RunningActivityMapper runningActivityMapper;
 	private static PhysicalFitnessTestMapper physicalFitnessTestMapper;
 	private static RunningActivityDataStatisticMapper runningActivityDataStatisticMapper;
+	private static AreaActivityDataStatisticMapper areaActivityDataStatisticMapper;
 	
 	private static AreaActivityMapper areaActivityMapper;
 	private static SportScoreMapper sportScoreMapper;
@@ -792,6 +796,20 @@ public class StudentType {
                                 List<RunningActivityDataStatistic> list = runningActivityDataStatisticMapper.selectByExample(example);
                                 return list;
                             }).build())
+					.field(GraphQLFieldDefinition.newFieldDefinition().name("areaActivityDataStatistic")
+                            .argument(GraphQLArgument.newArgument().name("pageNumber").type(Scalars.GraphQLInt).build())
+                            .argument(GraphQLArgument.newArgument().name("pageSize").type(Scalars.GraphQLInt).build())
+                            .argument(GraphQLArgument.newArgument().name("studentName").type(Scalars.GraphQLString).build())
+                            .argument(GraphQLArgument.newArgument().name("studentNo").type(Scalars.GraphQLString).build())
+                            .description("该学生区域记录运动点统计")
+                            .type(PageType.getPageTypeBuidler(AreaActivityDataStatisticType.getType())
+                                    .name("AreaActivityDataStatisticInfoPage").description("学生区域记录运动点统计信息分页").build())
+                            .dataFetcher(environment -> {
+                                Student student = environment.getSource();
+                                PageHelper.startPage(environment.getArgument("pageNumber"), environment.getArgument("pageSize"));
+                                List<AreaActivityDataStatistic> list = areaActivityDataStatisticMapper.selectByStudentId(student.getId());
+                                return list;
+                            }).build())
 					.build();
 		}
 
@@ -956,5 +974,10 @@ public class StudentType {
     @Autowired(required = true)
     public void setRunningActivityDataStatisticMapper(RunningActivityDataStatisticMapper runningActivityDataStatisticMapper) {
         StudentType.runningActivityDataStatisticMapper = runningActivityDataStatisticMapper;
+    }
+    
+    @Autowired(required = true)
+    public void setAreaActivityDataStatisticMapper(AreaActivityDataStatisticMapper areaActivityDataStatisticMapper) {
+        StudentType.areaActivityDataStatisticMapper = areaActivityDataStatisticMapper;
     }
 }
