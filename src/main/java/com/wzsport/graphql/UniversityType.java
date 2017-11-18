@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.wzsport.mapper.SportsCourseMapper;
 import com.github.pagehelper.PageHelper;
 import com.wzsport.mapper.CollegeMapper;
 import com.wzsport.mapper.TeacherMapper;
@@ -12,6 +13,7 @@ import com.wzsport.mapper.UniversityMapper;
 import com.wzsport.mapper.UserMapper;
 import com.wzsport.model.College;
 import com.wzsport.model.CollegeExample;
+import com.wzsport.model.SportsCourse;
 import com.wzsport.model.Student;
 import com.wzsport.model.StudentExample;
 import com.wzsport.model.TeacherExample;
@@ -38,12 +40,13 @@ public class UniversityType {
 	private static UniversityMapper universityMapper;
 	private static CollegeMapper collegeMapper;
 	private static TeacherMapper teacherMapper;
+	private static SportsCourseMapper sportsCourseMapper;
 	private static UserMapper userMapper;
 	private static TermService termService;
 	private static GraphQLObjectType type;
 	private static GraphQLFieldDefinition singleQueryField;
 	private static GraphQLFieldDefinition listField;
-
+	
 	private UniversityType() {}
 	
 	public static GraphQLObjectType getType() {
@@ -175,6 +178,42 @@ public class UniversityType {
 								return termService.getCurrentTerm(university.getId());
 							} )
 							.build())
+					.field(GraphQLFieldDefinition.newFieldDefinition()
+							.name("teacherNameList")
+							.description("该校的所有体育教师")
+							.type(new GraphQLList(SportsCourseType.getType()))
+							.dataFetcher(environment ->  {
+								University university = environment.getSource();
+								return sportsCourseMapper.getTeacherName(university.getId());
+							} )
+							.build())
+					.field(GraphQLFieldDefinition.newFieldDefinition()
+							.name("schoolYearList")
+							.description("该校的所有学年")
+							.type(new GraphQLList(SportsCourseType.getType()))
+							.dataFetcher(environment ->  {
+								University university = environment.getSource();
+								return sportsCourseMapper.getSchoolYear(university.getId());
+							} )
+							.build())
+					.field(GraphQLFieldDefinition.newFieldDefinition()
+							.name("courseNameList")
+							.description("该校的所有体育课名")
+							.type(new GraphQLList(SportsCourseType.getType()))
+							.dataFetcher(environment ->  {
+								University university = environment.getSource();
+								return sportsCourseMapper.getCourseName(university.getId());
+							} )
+							.build())
+					.field(GraphQLFieldDefinition.newFieldDefinition()
+							.name("courseTimeList")
+							.description("该校的所有体育课时段")
+							.type(new GraphQLList(SportsCourseType.getType()))
+							.dataFetcher(environment ->  {
+								University university = environment.getSource();
+								return sportsCourseMapper.getCourseTime(university.getId());
+							} )
+							.build())
 					.build();
 		}
 		
@@ -237,4 +276,11 @@ public class UniversityType {
 	public void setTermService(TermService termService) {
 		UniversityType.termService = termService;
 	}
+	
+	@Autowired(required = true)
+	public void setSportsCourseMapper(SportsCourseMapper sportsCourseMapper) {
+		UniversityType.sportsCourseMapper = sportsCourseMapper;
+	}
+	
+	
 }

@@ -13,6 +13,7 @@ import com.github.pagehelper.PageHelper;
 import com.wzsport.mapper.AreaActivityMapper;
 import com.wzsport.mapper.FitnessCheckDataMapper;
 import com.wzsport.mapper.PhysicalFitnessTestMapper;
+import com.wzsport.mapper.PhysicalTestMapper;
 import com.wzsport.mapper.RunningActivityMapper;
 import com.wzsport.mapper.SportScoreMapper;
 import com.wzsport.mapper.StudentMapper;
@@ -22,6 +23,8 @@ import com.wzsport.model.FitnessCheckData;
 import com.wzsport.model.FitnessCheckDataExample;
 import com.wzsport.model.PhysicalFitnessTest;
 import com.wzsport.model.PhysicalFitnessTestExample;
+import com.wzsport.model.PhysicalTest;
+import com.wzsport.model.PhysicalTestExample;
 import com.wzsport.model.RunningActivity;
 import com.wzsport.model.RunningActivityExample;
 import com.wzsport.model.SportScore;
@@ -56,6 +59,7 @@ public class StudentType {
 	private static FitnessCheckDataMapper fitnessCheckDataMapper;
 	private static RunningActivityMapper runningActivityMapper;
 	private static PhysicalFitnessTestMapper physicalFitnessTestMapper;
+	private static PhysicalTestMapper physicalTestMapper;
 	
 	private static AreaActivityMapper areaActivityMapper;
 	private static SportScoreMapper sportScoreMapper;
@@ -124,18 +128,17 @@ public class StudentType {
 								}
 								return null;
 							}).build())
-					.field(GraphQLFieldDefinition.newFieldDefinition().name("physicalFitnessTest")
+					.field(GraphQLFieldDefinition.newFieldDefinition().name("physicalTest")
 							.description("该学生的所有体测数据取第一条")
-							//.type(new GraphQLList(PhysicalFitnessTestType.getType()))
-							.type(PhysicalFitnessTestType.getType())
+							.type(PhysicalTestType.getType())
 							.dataFetcher(environment -> {
+								System.out.println("jinlaile ");
 								Student student = environment.getSource();
-								PhysicalFitnessTestExample physicalFitnessTestExample = new PhysicalFitnessTestExample();
-								physicalFitnessTestExample.createCriteria().andStudentNoEqualTo(student.getStudentNo());
-								List<PhysicalFitnessTest> physicalFitnessTestList = physicalFitnessTestMapper.selectByExample(physicalFitnessTestExample);
-								if (physicalFitnessTestList.size() != 0) {
-									System.out.println(physicalFitnessTestList.size());
-									return physicalFitnessTestList.get(0);
+								PhysicalTestExample physicalTestExample = new PhysicalTestExample();
+								physicalTestExample.createCriteria().andStudentNoEqualTo(student.getStudentNo());
+								List<PhysicalTest> physicalTestList = physicalTestMapper.selectByExample(physicalTestExample);
+								if (physicalTestList.size() != 0) {
+									return physicalTestList.get(0);
 								}
 								return null;
 							}).build())
@@ -862,7 +865,7 @@ public class StudentType {
 						String name = environment.getArgument("name");
 						String studentNo = environment.getArgument("studentNo");
 						Boolean isMan = environment.getArgument("isMan");
-
+						System.out.println("jinlai1");
 						StudentExample studentExample = new StudentExample();
 						Criteria studentExamplesCriteria = studentExample.createCriteria();
 						if (classId != null) {
@@ -877,7 +880,7 @@ public class StudentType {
 						if (isMan != null) {
 							studentExamplesCriteria.andManEqualTo(isMan);
 						}
-
+						
 						PageHelper.startPage(environment.getArgument("pageNumber"),
 								environment.getArgument("pageSize"));
 						List<Student> studentList = studentMapper.selectByExample(studentExample);
@@ -932,6 +935,11 @@ public class StudentType {
 	@Autowired(required = true)
 	public void setPhysicalFitnessTestMapper(PhysicalFitnessTestMapper physicalFitnessTestMapper) {
 		StudentType.physicalFitnessTestMapper = physicalFitnessTestMapper;
+	}
+
+	@Autowired(required = true)
+	public void setPhysicalTestMapper(PhysicalTestMapper physicalTestMapper) {
+		StudentType.physicalTestMapper = physicalTestMapper;
 	}
 	
 	
