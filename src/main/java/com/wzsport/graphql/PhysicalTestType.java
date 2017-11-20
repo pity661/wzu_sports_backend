@@ -112,7 +112,7 @@ public class PhysicalTestType {
 							.build())
 					.build();
 		}
-		
 		return type;
 	}
+	
 }

@@ -6,7 +6,7 @@
 <generatorConfiguration>
 
   <!-- 根据本地环境填写JDBC驱动包的路径 -->
-  <classPathEntry location="C:/Users/mysql-connector-java-5.1.44/mysql-connector-java-5.1.44-bin.jar" />
+  <classPathEntry location="/Users/chaiyu/mysql-connector-java-5.1.43/mysql-connector-java-5.1.43-bin.jar" />
 
   <context id="wzsport" targetRuntime="MyBatis3">
     <jdbcConnection driverClass="com.mysql.jdbc.Driver"
@@ -230,9 +230,22 @@
       <columnOverride column="ended_by" javaType="java.lang.Boolean"/>
     </table>
     
-    <table schema="wzsport" tableName="wzsport_physical_fitness_test" domainObjectName ="PhysicalFitnessTest" >
+    <table schema="wzsport" tableName="wzsport_student_sports_course_physical_test_view" domainObjectName ="StudentCoursePhysicalTest" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <columnOverride column="is_man" property="isMan" javaType="java.lang.Boolean"/>
+      <columnOverride column="is_tested" property="isTested" javaType="java.lang.Boolean"/>
+      <columnOverride column="is_free_test" property="isFreeTest" javaType="java.lang.Boolean"/>
+      <columnOverride column="is_pass" property="isPass" javaType="java.lang.Boolean"/>
+      <columnOverride column="height" property="height" javaType="java.lang.Double"/>
+      <columnOverride column="weight" property="weight" javaType="java.lang.Double"/>
+      <columnOverride column="fifty_run_time" property="fiftyRunTime" javaType="java.lang.Double"/>
+      <columnOverride column="sit_and_reach" property="sitAndReach" javaType="java.lang.Double"/>
+      <columnOverride column="eight_hundred_run_time" property="eightHundredRunTime" javaType="java.lang.Double"/>
+      <columnOverride column="one_thousand_run_time" property="oneThousandRunTime" javaType="java.lang.Double"/>
+      <columnOverride column="one_minute_sit_up" property="oneMinuteSitUp" javaType="java.lang.Integer"/>
+      <columnOverride column="pull_up" property="pullUp" javaType="java.lang.Integer"/>
+      <columnOverride column="total_score" property="totalScore" javaType="java.lang.Double"/>
+      <columnOverride column="term" property="term" javaType="java.lang.Integer"/>
       <ignoreColumn column="created_at"/>
       <ignoreColumn column="updated_at"/>
     </table>
@@ -242,6 +255,7 @@
       <columnOverride column="is_man" property="isMan" javaType="java.lang.Boolean"/>
       <columnOverride column="is_tested" property="isTested" javaType="java.lang.Boolean"/>
       <columnOverride column="is_free_test" property="isFreeTest" javaType="java.lang.Boolean"/>
+      <columnOverride column="is_pass" property="isPass" javaType="java.lang.Boolean"/>
       <columnOverride column="height" property="height" javaType="java.lang.Double"/>
       <columnOverride column="weight" property="weight" javaType="java.lang.Double"/>
       <columnOverride column="fifty_run_time" property="fiftyRunTime" javaType="java.lang.Double"/>
@@ -250,13 +264,14 @@
       <columnOverride column="one_thousand_run_time" property="oneThousandRunTime" javaType="java.lang.Double"/>
       <columnOverride column="one_minute_sit_up" property="oneMinuteSitUp" javaType="java.lang.Integer"/>
       <columnOverride column="pull_up" property="pullUp" javaType="java.lang.Integer"/>
+      <columnOverride column="total_score" property="totalScore" javaType="java.lang.Double"/>
       <ignoreColumn column="created_at"/>
       <ignoreColumn column="updated_at"/>
     </table>
     
     <table schema="wzsport" tableName="wzsport_sports_course" domainObjectName ="SportsCourse" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
-      <columnOverride column="term" property="term" javaType="java.lang.Byte"/>
+      <columnOverride column="term" property="term" javaType="java.lang.Integer"/>
       <columnOverride column="is_man" property="isMan" javaType="java.lang.Boolean"/>
       <ignoreColumn column="created_at"/>
       <ignoreColumn column="updated_at"/>
