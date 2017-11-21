@@ -119,4 +119,23 @@ public interface SportsCourseMapper {
 		"course_time, student_no, student_name, is_man, major_name, college_name", "from wzsport_sports_course ",
 		"where university_id = #{id,jdbcType=BIGINT} group by course_time" })
 	List<SportsCourse> getCourseTime(Long id);
+	
+	@Select({ "select", "id, university_id, school_year, term, subject_number, course_name, teacher_name, ",
+		"course_time, student_no, student_name, is_man, major_name, college_name", "from wzsport_sports_course ",
+		"where university_id = #{universityId,jdbcType=BIGINT} ", "and school_year = #{schoolYear,jdbcType=VARCHAR} ",
+		"and term = #{term,jdbcType=BIT} group by teacher_name" })
+	List<SportsCourse> getTeacherNameBySchoolYearAndTerm(SportsCourse record);
+	
+	@Select({ "select", "id, university_id, school_year, term, subject_number, course_name, teacher_name, ",
+		"course_time, student_no, student_name, is_man, major_name, college_name", "from wzsport_sports_course ",
+		"where university_id = #{universityId,jdbcType=BIGINT} and school_year = #{schoolYear,jdbcType=VARCHAR} "
+		+ "and term = #{term,jdbcType=BIT} and teacher_name = #{teacherName,jdbcType=VARCHAR} group by course_name" })
+	List<SportsCourse> getCourseNameBySchoolYearAndTermAndTeacherName(SportsCourse record);
+	
+	@Select({ "select", "id, university_id, school_year, term, subject_number, course_name, teacher_name, ",
+		"course_time, student_no, student_name, is_man, major_name, college_name", "from wzsport_sports_course ",
+		"where university_id = #{universityId,jdbcType=BIGINT} and school_year = #{schoolYear,jdbcType=VARCHAR} "
+		+ "and term = #{term,jdbcType=BIT} and teacher_name = #{teacherName,jdbcType=VARCHAR} "
+		+ "and course_name = #{courseName,jdbcType=VARCHAR} group by course_time" })
+	List<SportsCourse> getCourseTimeBySchoolYearAndTermAndTeacherNameAndCourseName(SportsCourse record);
 }
