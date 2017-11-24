@@ -189,7 +189,6 @@ public class UniversityType {
 								
 								String schoolYear = environment.getArgument("schoolYear");
 								Integer term = environment.getArgument("term");
-								System.out.println(schoolYear + term);
 								if (schoolYear != null && term != null){
 									SportsCourse record = new SportsCourse();
 									record.setUniversityId(university.getId());

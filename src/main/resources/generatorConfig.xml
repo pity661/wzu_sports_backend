@@ -251,7 +251,8 @@
     </table>
     
     <table schema="wzsport" tableName="wzsport_physical_test" domainObjectName ="PhysicalTest" >
-      <generatedKey column="id" sqlStatement="MySql" identity="true" />
+      <generatedKey column="id" sqlStatement="MySql" identity="true" />     
+      <columnOverride column="term" property="term" javaType="java.lang.Integer"/>
       <columnOverride column="is_man" property="isMan" javaType="java.lang.Boolean"/>
       <columnOverride column="is_tested" property="isTested" javaType="java.lang.Boolean"/>
       <columnOverride column="is_free_test" property="isFreeTest" javaType="java.lang.Boolean"/>
@@ -273,6 +274,14 @@
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <columnOverride column="term" property="term" javaType="java.lang.Integer"/>
       <columnOverride column="is_man" property="isMan" javaType="java.lang.Boolean"/>
+      <ignoreColumn column="created_at"/>
+      <ignoreColumn column="updated_at"/>
+    </table>
+    
+    <table schema="wzsport" tableName="wzsport_update_physical_test_record" domainObjectName ="UpdatePhysicalTestRecord" >
+      <generatedKey column="id" sqlStatement="MySql" identity="true" /> 
+      <columnOverride column="term" property="term" javaType="java.lang.Integer"/>
+      <columnOverride column="alter_time" property="alterTime" javaType="java.sql.Timestamp"/>
       <ignoreColumn column="created_at"/>
       <ignoreColumn column="updated_at"/>
     </table>

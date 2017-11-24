@@ -12,6 +12,7 @@ import com.wzsport.graphql.CollegeType;
 import com.wzsport.graphql.FitnessCheckDataType;
 import com.wzsport.graphql.FixLocationOutdoorSportPointType;
 import com.wzsport.graphql.MajorType;
+import com.wzsport.graphql.PhysicalTestType;
 import com.wzsport.graphql.RunningActivityType;
 import com.wzsport.graphql.RunningSportType;
 import com.wzsport.graphql.SportScoreType;
@@ -81,6 +82,7 @@ public class GraphQLServiceImpl implements GraphQLService {
                 .field(ClientVersionType.getLatestVerisonQueryField())
                 .field(SportsCourseType.getListQueryField())
                 .field(StudentCoursePhysicalTestType.getListQueryField())
+                .field(PhysicalTestType.getSingleQueryField())
                 .build();
 		
 		GraphQLSchema schema = GraphQLSchema.newSchema()
