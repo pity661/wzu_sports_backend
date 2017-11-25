@@ -1,5 +1,6 @@
 package com.wzsport.mapper;
 
+import com.wzsport.model.AreaActivityDataStatistic;
 import com.wzsport.model.RunningActivityDataStatistic;
 import com.wzsport.model.RunningActivityDataStatisticExample;
 import java.util.List;
@@ -96,4 +97,103 @@ public interface RunningActivityDataStatisticMapper {
             "distance_per_step_against = #{distancePerStepAgainst,jdbcType=INTEGER}",
             "where id = #{id,jdbcType=BIGINT}" })
     int updateByPrimaryKey(RunningActivityDataStatistic record);
+    
+    @Select({
+        "select s.id, s.student_id, s.activity_id, s.location_total_count, s.speed_against, s.distance_per_step_against \n" + 
+        "from wzsport_running_activity_data_statistic as s\n" + 
+        "where s.student_id = #{studentId,jdbcType=BIGINT}\n"
+    })
+    @ResultMap("com.wzsport.mapper.RunningActivityDataStatisticMapper.BaseResultMap")
+    List<RunningActivityDataStatistic> selectByStudentId(@Param("studentId") Long studentId);
+    
+    /**
+     * 违背速度比例大于
+     */
+    @Select({
+        "select s.id, s.student_id, s.activity_id, s.location_total_count, s.speed_against, s.distance_per_step_against from (\n" + 
+        "select *, (speed_against / location_total_count) as speed_against_percent \n" + 
+        "from wzsport_running_activity_data_statistic) as s\n" + 
+        "where s.student_id =  #{studentId, jdbcType=BIGINT}\n" + 
+        "and speed_against_percent >= #{speedAgainstPercent, jdbcType=DECIMAL}"
+    })
+    @ResultMap("com.wzsport.mapper.RunningActivityDataStatisticMapper.BaseResultMap")
+    List<RunningActivityDataStatistic> selectBySpeedGreaterThan(@Param("studentId") Long studentId, 
+            @Param("speedAgainstPercent") Double speedAgainstPercent);
+    
+    /**
+     * 违背速度比例小于
+     */
+    @Select({
+        "select s.id, s.student_id, s.activity_id, s.location_total_count, s.speed_against, s.distance_per_step_against from (\n" + 
+        "select *, (speed_against / location_total_count) as speed_against_percent \n" + 
+        "from wzsport_running_activity_data_statistic) as s\n" + 
+        "where s.student_id =  #{studentId, jdbcType=BIGINT}\n" + 
+        "and speed_against_percent < #{speedAgainstPercent, jdbcType=DECIMAL}"
+    })
+    @ResultMap("com.wzsport.mapper.RunningActivityDataStatisticMapper.BaseResultMap")
+    List<RunningActivityDataStatistic> selectBySpeedLessThan(@Param("studentId") Long studentId, 
+            @Param("speedAgainstPercent") Double speedAgainstPercent);
+    
+    /**
+     * 违背速度比例介于两者之间
+     */
+    @Select({
+        "select s.id, s.student_id, s.activity_id, s.location_total_count, s.speed_against, s.distance_per_step_against from (\n" + 
+        "select *, (speed_against / location_total_count) as speed_against_percent \n" + 
+        "from wzsport_running_activity_data_statistic) as s\n" + 
+        "where s.student_id = #{studentId, jdbcType=BIGINT} \n" + 
+        " and speed_against_percent between #{speedAgainstPercent, jdbcType=DECIMAL} and " +
+        "  #{anotherSpeedAgainstPercent, jdbcType=DECIMAL}"
+    })
+    @ResultMap("com.wzsport.mapper.RunningActivityDataStatisticMapper.BaseResultMap")
+    List<RunningActivityDataStatistic> selectBySpeedBetween(@Param("studentId") Long studentId, 
+            @Param("speedAgainstPercent") Double speedAgainstPercent,
+            @Param("anotherSpeedAgainstPercent") Double anotherSpeedAgainstPercent
+            );
+    
+    /**
+     * 违背步幅比例大于
+     */
+    @Select({
+        "select s.id, s.student_id, s.activity_id, s.location_total_count, s.speed_against, s.distance_per_step_against from (\n" + 
+        "select *, (distance_per_step_against / location_total_count) as distance_per_step_against_percent \n" + 
+        "from wzsport_running_activity_data_statistic) as s\n" + 
+        "where s.student_id =  #{studentId, jdbcType=BIGINT}\n" + 
+        "and distance_per_step_against_percent >= #{distancePerStepAgainstPercent, jdbcType=DECIMAL}"
+    })
+    @ResultMap("com.wzsport.mapper.RunningActivityDataStatisticMapper.BaseResultMap")
+    List<RunningActivityDataStatistic> selectByDistancePerStepGreaterThan(@Param("studentId") Long studentId, 
+            @Param("distancePerStepAgainstPercent") Double distancePerStepAgainstPercent);
+    
+    /**
+     * 违背步幅比例小于
+     */
+    @Select({
+        "select s.id, s.student_id, s.activity_id, s.location_total_count, s.speed_against, s.distance_per_step_against from (\n" + 
+        "select *, (distance_per_step_against / location_total_count) as distance_per_step_against_percent \n" + 
+        "from wzsport_running_activity_data_statistic) as s\n" + 
+        "where s.student_id =  #{studentId, jdbcType=BIGINT}\n" + 
+        "and distance_per_step_against_percent < #{distancePerStepAgainstPercent, jdbcType=DECIMAL}"
+    })
+    @ResultMap("com.wzsport.mapper.RunningActivityDataStatisticMapper.BaseResultMap")
+    List<RunningActivityDataStatistic> selectByDistancePerStepLessThan(@Param("studentId") Long studentId, 
+            @Param("distancePerStepAgainstPercent") Double distancePerStepAgainstPercent);
+    
+    /**
+     * 违背步幅比例介于两者之间
+     */
+    @Select({
+        "select s.id, s.student_id, s.activity_id, s.location_total_count, s.speed_against, s.distance_per_step_against from (\n" + 
+        "select *, (distance_per_step_against / location_total_count) as distance_per_step_against_percent \n" + 
+        "from wzsport_running_activity_data_statistic) as s\n" + 
+        "where s.student_id = #{studentId, jdbcType=BIGINT} \n" + 
+        " and distance_per_step_against_percent between #{distancePerStepAgainstPercent, jdbcType=DECIMAL} and " +
+        "  #{anotherDistancePerStepAgainstPercent, jdbcType=DECIMAL}"
+    })
+    @ResultMap("com.wzsport.mapper.RunningActivityDataStatisticMapper.BaseResultMap")
+    List<RunningActivityDataStatistic> selectByDistancePerStepBetween(@Param("studentId") Long studentId, 
+            @Param("distancePerStepAgainstPercent") Double distancePerStepAgainstPercent,
+            @Param("anotherDistancePerStepAgainstPercent") Double anotherDistancePerStepAgainstPercent
+            );
+    
 }

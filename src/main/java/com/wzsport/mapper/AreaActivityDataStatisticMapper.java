@@ -103,4 +103,58 @@ public interface AreaActivityDataStatisticMapper {
     })
     @ResultMap("com.wzsport.mapper.AreaActivityDataStatisticMapper.ResultMapWithFixLocation")
     List<AreaActivityDataStatistic> selectByStudentId(@Param("studentId") Long studentId);
+    
+    /**
+     * 比例大于
+     */
+    @Select({
+        "select s.id, s.student_id, s.activity_id, s.location_total_count, s.location_against,"
+        + " p.id as location_id, p.name as location_name from (\n" + 
+        " select *, (location_against / location_total_count) as location_against_percent \n" + 
+        " from wzsport_area_activity_data_statistic) as s \n" + 
+        " left join wzsport_area_activity as a on s.activity_id = a.id " +
+        " left join wzsport_fix_location_outdoor_sport_point as p on a.location_id = p.id " +
+        " where s.student_id = #{studentId, jdbcType=BIGINT}"
+        + " and location_against_percent >= #{locationAgainstPercent, jdbcType=DECIMAL}"
+    })
+    @ResultMap("com.wzsport.mapper.AreaActivityDataStatisticMapper.ResultMapWithFixLocation")
+    List<AreaActivityDataStatistic> selectByStudentIdGreaterThan(@Param("studentId") Long studentId, 
+            @Param("locationAgainstPercent") Double locationAgainstPercent);
+    
+    /**
+     * 比例小于
+     */
+    @Select({
+        "select s.id, s.student_id, s.activity_id, s.location_total_count, s.location_against, "
+        + " p.id as location_id, p.name as location_name from (\n" + 
+        " select *, (location_against / location_total_count) as location_against_percent \n" + 
+        " from wzsport_area_activity_data_statistic) as s \n" + 
+        " left join wzsport_area_activity as a on s.activity_id = a.id " +
+        " left join wzsport_fix_location_outdoor_sport_point as p on a.location_id = p.id " +
+        " where s.student_id = #{studentId, jdbcType=BIGINT}"
+        + " and location_against_percent < #{locationAgainstPercent, jdbcType=DECIMAL}"
+    })
+    @ResultMap("com.wzsport.mapper.AreaActivityDataStatisticMapper.ResultMapWithFixLocation")
+    List<AreaActivityDataStatistic> selectByStudentIdLessThan(@Param("studentId") Long studentId, 
+            @Param("locationAgainstPercent") Double locationAgainstPercent);
+    
+    /**
+     * 比例介于两者之间
+     */
+    @Select({
+        "select s.id, s.student_id, s.activity_id, s.location_total_count, s.location_against, "
+        + " p.id as location_id, p.name as location_name from (\n" + 
+        " select *, (location_against / location_total_count) as location_against_percent \n" + 
+        " from wzsport_area_activity_data_statistic) as s \n" + 
+        " left join wzsport_area_activity as a on s.activity_id = a.id " +
+        " left join wzsport_fix_location_outdoor_sport_point as p on a.location_id = p.id " +
+        " where s.student_id = #{studentId, jdbcType=BIGINT}"
+        + " and location_against_percent between #{locationAgainstPercent, jdbcType=DECIMAL} and "
+        + " #{anotherLocationAgainstPercent, jdbcType=DECIMAL}"
+    })
+    @ResultMap("com.wzsport.mapper.AreaActivityDataStatisticMapper.ResultMapWithFixLocation")
+    List<AreaActivityDataStatistic> selectByStudentIdBetween(@Param("studentId") Long studentId, 
+            @Param("locationAgainstPercent") Double locationAgainstPercent,
+            @Param("anotherLocationAgainstPercent") Double anotherLocationAgainstPercent
+            );
 }

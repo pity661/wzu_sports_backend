@@ -2,6 +2,7 @@ package com.wzsport.graphql;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -9,7 +10,9 @@ import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.wzsport.graphql.RunningActivityType.Operator;
 import com.wzsport.mapper.AreaActivityDataStatisticMapper;
 import com.wzsport.mapper.AreaActivityMapper;
 import com.wzsport.mapper.FitnessCheckDataMapper;
@@ -30,6 +33,8 @@ import com.wzsport.model.RunningActivity;
 import com.wzsport.model.RunningActivityDataStatistic;
 import com.wzsport.model.RunningActivityDataStatisticExample;
 import com.wzsport.model.RunningActivityExample;
+import com.wzsport.model.RunningActivityView;
+import com.wzsport.model.RunningActivityViewExample;
 import com.wzsport.model.SportScore;
 import com.wzsport.model.SportScoreExample;
 import com.wzsport.model.Student;
@@ -82,6 +87,18 @@ public class StudentType {
 			.value(TimeRange.CURRENT_WEEK.toString()).value(TimeRange.CURRENT_MONTH.toString())
 			.value(TimeRange.CURRENT_TERM.toString()).build();
 
+	public static enum Operator {
+        LESS_THAN, GREATER_THAN, EQUAL, BETWEEN
+    }
+    
+    private static GraphQLEnumType operatorEnumType = GraphQLEnumType.newEnum()
+            .name("Operator")
+            .value(Operator.LESS_THAN.toString())
+            .value(Operator.GREATER_THAN.toString())
+            .value(Operator.EQUAL.toString())
+            .value(Operator.BETWEEN.toString())
+            .build();
+    
 	private StudentType() {
 	}
 
@@ -782,32 +799,111 @@ public class StudentType {
 					.field(GraphQLFieldDefinition.newFieldDefinition().name("runningActivityDataStatistic")
 					        .argument(GraphQLArgument.newArgument().name("pageNumber").type(Scalars.GraphQLInt).build())
                             .argument(GraphQLArgument.newArgument().name("pageSize").type(Scalars.GraphQLInt).build())
-                            .argument(GraphQLArgument.newArgument().name("studentName").type(Scalars.GraphQLString).build())
-                            .argument(GraphQLArgument.newArgument().name("studentNo").type(Scalars.GraphQLString).build())
+                            .argument(GraphQLArgument.newArgument().name("speedAgainstPercent").type(Scalars.GraphQLFloat).build())
+                            .argument(GraphQLArgument.newArgument().name("speedAgainstOperator").type(operatorEnumType).build())
+                            .argument(GraphQLArgument.newArgument().name("anotherSpeedAgainstPercent").type(Scalars.GraphQLFloat).build())
+                            .argument(GraphQLArgument.newArgument().name("distancePerStepAgainstPercent").type(Scalars.GraphQLFloat).build())
+                            .argument(GraphQLArgument.newArgument().name("distancePerStepAgainstOperator").type(operatorEnumType).build())
+                            .argument(GraphQLArgument.newArgument().name("anotherDistancePerStepAgainstPercent").type(Scalars.GraphQLFloat).build())
                             .description("该学生跑步记录运动点统计")
                             .type(PageType.getPageTypeBuidler(RunningActivityDataStatisticType.getType())
                                     .name("RunningActivityDataStatisticInfoPage").description("学生跑步记录运动点统计信息分页").build())
                             .dataFetcher(environment -> {
+                                List<RunningActivityDataStatistic> list = null;
                                 Student student = environment.getSource();
-                                RunningActivityDataStatisticExample example = new RunningActivityDataStatisticExample();
-                                RunningActivityDataStatisticExample.Criteria  criteria = example.createCriteria();
-                                criteria.andStudentIdEqualTo(student.getId());
                                 PageHelper.startPage(environment.getArgument("pageNumber"), environment.getArgument("pageSize"));
-                                List<RunningActivityDataStatistic> list = runningActivityDataStatisticMapper.selectByExample(example);
+                                
+                                Double speedAgainstPercent = environment.getArgument("speedAgainstPercent");
+                                if (speedAgainstPercent != null) {
+                                    speedAgainstPercent = speedAgainstPercent / 100;
+                                    switch(Operator.valueOf(environment.getArgument("speedAgainstOperator"))) {
+                                    case BETWEEN:
+                                        double anotherLocationAgainstPercent = environment.getArgument("anotherSpeedAgainstPercent");
+                                        list = runningActivityDataStatisticMapper
+                                                .selectBySpeedBetween(student.getId(), speedAgainstPercent, anotherLocationAgainstPercent);
+                                        break;
+                                    case GREATER_THAN:
+                                        list = runningActivityDataStatisticMapper
+                                                .selectBySpeedGreaterThan(student.getId(), speedAgainstPercent);
+                                        break;
+                                    case LESS_THAN:
+                                        list = runningActivityDataStatisticMapper
+                                                .selectBySpeedLessThan(student.getId(), speedAgainstPercent);
+                                        break;
+                                    default:
+                                        list = runningActivityDataStatisticMapper.selectByStudentId(student.getId());
+                                        break;
+                                    }
+                                } else {
+                                    list = runningActivityDataStatisticMapper.selectByStudentId(student.getId());
+                                }
+                                
+                                Double distancePerStepAgainstPercent = environment.getArgument("distancePerStepAgainstPercent");
+                                if (distancePerStepAgainstPercent != null) {
+                                    distancePerStepAgainstPercent = distancePerStepAgainstPercent / 100;
+                                    switch(Operator.valueOf(environment.getArgument("distancePerStepAgainstOperator"))) {
+                                    case BETWEEN:
+                                        double anotherDistancePerStepAgainstPercent = environment.getArgument("anotherDistancePerStepAgainstPercent");
+                                        list = runningActivityDataStatisticMapper
+                                                .selectByDistancePerStepBetween(student.getId(), distancePerStepAgainstPercent, anotherDistancePerStepAgainstPercent);
+                                        break;
+                                    case GREATER_THAN:
+                                        list = runningActivityDataStatisticMapper
+                                                .selectByDistancePerStepGreaterThan(student.getId(), distancePerStepAgainstPercent);
+                                        break;
+                                    case LESS_THAN:
+                                        list = runningActivityDataStatisticMapper
+                                                .selectByDistancePerStepLessThan(student.getId(), distancePerStepAgainstPercent);
+                                        break;
+                                    default:
+                                        list = runningActivityDataStatisticMapper.selectByStudentId(student.getId());
+                                        break;
+                                    }
+                                } else {
+                                    list = runningActivityDataStatisticMapper.selectByStudentId(student.getId());
+                                }
+                                
+                                
                                 return list;
                             }).build())
 					.field(GraphQLFieldDefinition.newFieldDefinition().name("areaActivityDataStatistic")
-                            .argument(GraphQLArgument.newArgument().name("pageNumber").type(Scalars.GraphQLInt).build())
-                            .argument(GraphQLArgument.newArgument().name("pageSize").type(Scalars.GraphQLInt).build())
-                            .argument(GraphQLArgument.newArgument().name("studentName").type(Scalars.GraphQLString).build())
-                            .argument(GraphQLArgument.newArgument().name("studentNo").type(Scalars.GraphQLString).build())
+	                        .argument(GraphQLArgument.newArgument().name("pageNumber").type(Scalars.GraphQLInt).build())
+	                        .argument(GraphQLArgument.newArgument().name("pageSize").type(Scalars.GraphQLInt).build())
+                            .argument(GraphQLArgument.newArgument().name("locationAgainstPercent").type(Scalars.GraphQLFloat).build())
+                            .argument(GraphQLArgument.newArgument().name("locationAgainstOperator").type(operatorEnumType).build())
+                            .argument(GraphQLArgument.newArgument().name("anotherLocationAgainstPercent").type(Scalars.GraphQLFloat).build())
                             .description("该学生区域记录运动点统计")
                             .type(PageType.getPageTypeBuidler(AreaActivityDataStatisticType.getType())
                                     .name("AreaActivityDataStatisticInfoPage").description("学生区域记录运动点统计信息分页").build())
                             .dataFetcher(environment -> {
+                                List<AreaActivityDataStatistic> list = null;
                                 Student student = environment.getSource();
                                 PageHelper.startPage(environment.getArgument("pageNumber"), environment.getArgument("pageSize"));
-                                List<AreaActivityDataStatistic> list = areaActivityDataStatisticMapper.selectByStudentId(student.getId());
+                                
+                                Double locationAgainstPercent = environment.getArgument("locationAgainstPercent");
+                                if (locationAgainstPercent != null) {
+                                    locationAgainstPercent = locationAgainstPercent / 100;
+                                    switch(Operator.valueOf(environment.getArgument("locationAgainstOperator"))) {
+                                    case BETWEEN:
+                                        double anotherLocationAgainstPercent = environment.getArgument("anotherLocationAgainstPercent");
+                                        list = areaActivityDataStatisticMapper
+                                                .selectByStudentIdBetween(student.getId(), locationAgainstPercent, anotherLocationAgainstPercent);
+                                        break;
+                                    case GREATER_THAN:
+                                        list = areaActivityDataStatisticMapper
+                                                .selectByStudentIdGreaterThan(student.getId(), locationAgainstPercent);
+                                        break;
+                                    case LESS_THAN:
+                                        list = areaActivityDataStatisticMapper
+                                                .selectByStudentIdLessThan(student.getId(), locationAgainstPercent);
+                                        break;
+                                    default:
+                                        list = areaActivityDataStatisticMapper.selectByStudentId(student.getId());
+                                        break;
+                                    }
+                                } else {
+                                    list = areaActivityDataStatisticMapper.selectByStudentId(student.getId());
+                                }
                                 return list;
                             }).build())
 					.build();
