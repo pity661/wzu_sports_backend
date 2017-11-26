@@ -10,7 +10,7 @@ public class EvaluateUtil {
 		Double BMI = null;
 		//计算BMI
 		if(physicalTest.getHeight() != null && physicalTest.getWeight() != null){
-			BMI = (physicalTest.getWeight()/(physicalTest.getHeight()*physicalTest.getHeight()));
+			BMI = (physicalTest.getWeight()/((physicalTest.getHeight()/100.0)*(physicalTest.getHeight()/100.0)));
 			physicalTest.setBmi(BigDecimal.valueOf(BMI));
 		}
 		
@@ -312,7 +312,7 @@ public class EvaluateUtil {
 	}
 	
 	// 判断是否是高年级   改成根据体测成绩中的学年来判断
-    public static Boolean isHighGrade(String studentNo,String schoolYear) {
+    private static Boolean isHighGrade(String studentNo,String schoolYear) {
         String year = schoolYear.substring(2,4);
         if (Integer.parseInt(year) - Integer.parseInt(studentNo.substring(0, 2)) < 2) {
             return false;
