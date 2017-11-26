@@ -20,6 +20,7 @@ import com.wzsport.model.SportsCourse;
 import com.wzsport.model.SportsCourseExample;
 import com.wzsport.model.UpdatePhysicalTestRecord;
 import com.wzsport.model.User;
+import com.wzsport.util.EvaluateUtil;
 import com.wzsport.model.SportsCourseExample.Criteria;
 
 import graphql.Scalars;
@@ -148,8 +149,8 @@ public class PhysicalTestType {
 	                	PhysicalTest physicalTest = new PhysicalTest();
 	                	if (id != null) {	//修改
 	                		physicalTest = physicalTestMapper.selectByPrimaryKey(id);
-	                	} else {	//新增
-	                		if (schoolYear != null && term != null && studentNo != null) {
+	                	} else {	//新增，每个学校每个学号每学年每学期只有一条体测记录
+	                		if (schoolYear != null && term != null && studentNo != null && universityId != null) {
 	                			SportsCourseExample example = new SportsCourseExample();
 	                			Criteria criteria = example.createCriteria();
 	                			criteria.andSchoolYearEqualTo(schoolYear);
@@ -157,6 +158,7 @@ public class PhysicalTestType {
 	                			criteria.andTermEqualTo(term);
 	                			physicalTest.setTerm(term);
 	                			criteria.andStudentNoEqualTo(studentNo);
+	                			criteria.andUniversityIdEqualTo(universityId);
 	                			List<SportsCourse> list = sportsCourseMapper.selectByExample(example);
 	                			if (list.size() == 0) {
 	                				SportsCourse sportsCourse = new SportsCourse();
@@ -252,11 +254,15 @@ public class PhysicalTestType {
 	                		}
 	                	}
 	                	int result = 0;
+	                	//给各项体测数据计算分数
+                		physicalTest = EvaluateUtil.calculateScoreAndLevel(physicalTest);
+                		//将数据插入数据库
 	                	if (id != null){
 		                	result = physicalTestMapper.updateByPrimaryKey(physicalTest);
 	                	} else {
 	                		result = physicalTestMapper.insert(physicalTest);
 	                	}
+	                	//若插入成功，生成操作人员记录
 	                	if (result == 1) {
 	                		User user = userMapper.selectWithRolesByUsername(userName);
 	                		UpdatePhysicalTestRecord updatePhysicalTestRecord = new UpdatePhysicalTestRecord();
