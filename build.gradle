@@ -72,7 +72,8 @@ dependencies {
     compile group: 'c3p0', name: 'c3p0', version: '0.9.0.4'
     compile 'com.qiniu:qiniu-java-sdk:7.2.+'
     compile group: 'org.json', name: 'json', version: '20160810'
-
+    compile group: 'net.sourceforge.jexcelapi', name: 'jxl', version: '2.6.12'
+    
     testCompile 'junit:junit:4.12'
     testCompile group: 'org.springframework', name: 'spring-test', version: '4.3.8.RELEASE'
 
