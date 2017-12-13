@@ -23,6 +23,7 @@ import com.wzsport.service.TermService;
 
 import graphql.Scalars;
 import graphql.schema.GraphQLArgument;
+import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLObjectType;
@@ -46,6 +47,18 @@ public class UniversityType {
 	private static GraphQLFieldDefinition singleQueryField;
 	private static GraphQLFieldDefinition listField;
 
+	public static enum Operator {
+		LESS_THAN, GREATER_THAN, EQUAL, BETWEEN
+	}
+	
+	private static GraphQLEnumType operatorEnumType = GraphQLEnumType.newEnum()
+		    .name("Operator")
+		    .value(Operator.LESS_THAN.toString())
+		    .value(Operator.GREATER_THAN.toString())
+		    .value(Operator.EQUAL.toString())
+		    .value(Operator.BETWEEN.toString())
+		    .build();
+	
 	private UniversityType() {}
 	
 	public static GraphQLObjectType getType() {
@@ -187,6 +200,9 @@ public class UniversityType {
 							.argument(GraphQLArgument.newArgument().name("studentName").type(Scalars.GraphQLString).build())
 							.argument(GraphQLArgument.newArgument().name("studentNo").type(Scalars.GraphQLString).build())
 							.argument(GraphQLArgument.newArgument().name("className").type(Scalars.GraphQLString).build())
+							.argument(GraphQLArgument.newArgument().name("signInCountOperator").type(operatorEnumType).build())
+							.argument(GraphQLArgument.newArgument().name("signInCount").type(Scalars.GraphQLLong).build())
+							.argument(GraphQLArgument.newArgument().name("anotherSignInCount").type(Scalars.GraphQLLong).build())
 							.type(PageType.getPageTypeBuidler(StudentStatisticType.getType())
 									.name("StudentStatisticInfoPage").description("学生基本运动信息分页").build())
 							.dataFetcher(environment -> {
@@ -195,6 +211,9 @@ public class UniversityType {
 								com.wzsport.model.StudentStatisticViewExample.Criteria criteria = example.createCriteria();
 								Long universityId = environment.getArgument("universityId");
 								String studentName = environment.getArgument("studentName");
+								
+								Long signInCount = environment.getArgument("signInCount");
+											
 								if (studentName != null) {
 									criteria.andStudentNameLike("%" + studentName + "%");
 								}
@@ -216,6 +235,25 @@ public class UniversityType {
 								if (isUser == 2) {
 									criteria.andUniversityIdEqualTo(universityId).andOpenIdEqualTo("");
 								}
+																
+								if (signInCount != null) {
+									switch(Operator.valueOf(environment.getArgument("signInCountOperator"))) {
+									case BETWEEN:
+										Long anotherSignInCount = environment.getArgument("anotherSignInCount");
+										criteria.andSignInCountBetween(signInCount, anotherSignInCount);
+										break;
+									case EQUAL:
+										criteria.andSignInCountEqualTo(signInCount);
+										break;
+									case GREATER_THAN:
+										criteria.andSignInCountGreaterThan(signInCount);
+										break;
+									case LESS_THAN:
+										criteria.andSignInCountLessThan(signInCount);
+										break;
+									}
+								}
+															
 								PageHelper.startPage(environment.getArgument("pageNumber"), environment.getArgument("pageSize"));
 								list = studentStatisticViewMapper.selectByExample(example);
 								return list;
