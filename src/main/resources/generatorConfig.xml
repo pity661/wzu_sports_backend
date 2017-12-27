@@ -6,13 +6,13 @@
 <generatorConfiguration>
 
   <!-- 根据本地环境填写JDBC驱动包的路径 -->
-  <classPathEntry location="/Users/chaiyu/mysql-connector-java-5.1.43/mysql-connector-java-5.1.43-bin.jar" />
-
+  <!-- <classPathEntry location="/Users/chaiyu/mysql-connector-java-5.1.43/mysql-connector-java-5.1.43-bin.jar" /> -->
+    <classPathEntry location="C:/Users/mysql-connector-java-5.1.44/mysql-connector-java-5.1.44-bin.jar" />
   <context id="wzsport" targetRuntime="MyBatis3">
     <jdbcConnection driverClass="com.mysql.jdbc.Driver"
         connectionURL="jdbc:mysql://119.23.12.36:3306/wzsport_online"
         userId="remote"
-        password="251725">
+        password="remote!QAZ">
     </jdbcConnection>
 
     <javaTypeResolver >
@@ -242,10 +242,14 @@
       <ignoreColumn column="updated_at"/>
     </table>
     
-    <table schema="wzpsort" tableName="wzsport_running_activity_data_statistic" domainObjectName ="RunningActivityDataStatistic" >
+    <table schema="wzsport" tableName="wzsport_running_activity_data_statistic" domainObjectName ="RunningActivityDataStatistic" >
       <generatedKey column="id" sqlStatement="MySql" identity="true" />
       <ignoreColumn column="created_at"/>
       <ignoreColumn column="updated_at"/>
+    </table>
+    
+    <table schema="wzsport" tableName="wzsport_teaching_class_student_sign_in_count_view" domainObjectName = "TeachingClassStudentSignInCountView">
+      <columnOverride column="is_man" property="isMan" javaType="java.lang.Boolean"/>
     </table>
     
   </context>

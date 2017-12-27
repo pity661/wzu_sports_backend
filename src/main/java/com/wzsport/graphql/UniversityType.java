@@ -9,6 +9,7 @@ import com.github.pagehelper.PageHelper;
 import com.wzsport.mapper.CollegeMapper;
 import com.wzsport.mapper.StudentStatisticViewMapper;
 import com.wzsport.mapper.TeacherMapper;
+import com.wzsport.mapper.TeachingClassStudentSignInCountViewMapper;
 import com.wzsport.mapper.UniversityMapper;
 import com.wzsport.mapper.UserMapper;
 import com.wzsport.model.College;
@@ -16,6 +17,7 @@ import com.wzsport.model.CollegeExample;
 import com.wzsport.model.StudentStatisticView;
 import com.wzsport.model.StudentStatisticViewExample;
 import com.wzsport.model.TeacherExample;
+import com.wzsport.model.TeachingClassStudentSignInCountView;
 import com.wzsport.model.University;
 import com.wzsport.model.UniversityExample;
 import com.wzsport.model.UserExample;
@@ -47,6 +49,8 @@ public class UniversityType {
 	private static GraphQLFieldDefinition singleQueryField;
 	private static GraphQLFieldDefinition listField;
 
+	private static TeachingClassStudentSignInCountViewMapper teachingClassStudentSignInCountViewMapper;
+	
 	public static enum Operator {
 		LESS_THAN, GREATER_THAN, EQUAL, BETWEEN
 	}
@@ -179,7 +183,7 @@ public class UniversityType {
 							.dataFetcher(environment ->  {
 								University university = environment.getSource();
 								PageHelper.startPage(environment.getArgument("pageNumber"), environment.getArgument("pageSize"));
-			                	return universityMapper.getTimeCostedRanking(university.getId());
+								return universityMapper.getTimeCostedRanking(university.getId());
 							} )
 							.build())
 					.field(GraphQLFieldDefinition.newFieldDefinition()
@@ -190,6 +194,102 @@ public class UniversityType {
 								return termService.getCurrentTerm(university.getId());
 							} )
 							.build())
+					.field(GraphQLFieldDefinition.newFieldDefinition()
+							.name("getSchoolYear")
+							.description("该校的所有学年")
+							.type(new GraphQLList(TeachingClassStudentSignInCountType.getType()))
+							.dataFetcher(environment ->  {
+								University university = environment.getSource();
+								return teachingClassStudentSignInCountViewMapper.getSchoolYear(university.getId());
+							} )
+							.build())
+					.field(GraphQLFieldDefinition.newFieldDefinition()
+							.name("getTerm")
+							.description("该学年的所有学期")
+							.argument(GraphQLArgument.newArgument().name("schoolYear").type(Scalars.GraphQLString).build())
+							.type(new GraphQLList(TeachingClassStudentSignInCountType.getType()))
+							.dataFetcher(environment ->  {
+								University university = environment.getSource();
+								String schoolYear = environment.getArgument("schoolYear");
+								if (schoolYear != null) {
+									TeachingClassStudentSignInCountView t = new TeachingClassStudentSignInCountView();
+									t.setSchoolYear(schoolYear);
+									t.setUniversityId(university.getId());
+									return teachingClassStudentSignInCountViewMapper.getTermBySchoolYear(t);
+								}
+								return teachingClassStudentSignInCountViewMapper.getTerm(university.getId());
+							} )
+							.build())
+					.field(GraphQLFieldDefinition.newFieldDefinition()
+							.name("getTeacher")
+							.description("该学年学期所有教师")
+							.argument(GraphQLArgument.newArgument().name("schoolYear").type(Scalars.GraphQLString).build())
+							.argument(GraphQLArgument.newArgument().name("term").type(Scalars.GraphQLString).build())
+							.type(new GraphQLList(TeachingClassStudentSignInCountType.getType()))
+							.dataFetcher(environment ->  {
+								University university = environment.getSource();
+								String schoolYear = environment.getArgument("schoolYear");
+								String term = environment.getArgument("term");
+								if (schoolYear != null && term != null) {
+									TeachingClassStudentSignInCountView t = new TeachingClassStudentSignInCountView();
+									t.setSchoolYear(schoolYear);
+									t.setTerm(term);
+									t.setUniversityId(university.getId());
+									return teachingClassStudentSignInCountViewMapper.getTeacherBySchoolYearAndTerm(t);
+								}
+								return teachingClassStudentSignInCountViewMapper.getTeacher(university.getId());
+							} )
+							.build())
+					.field(GraphQLFieldDefinition.newFieldDefinition()
+							.name("getCourseName")
+							.description("该学年学期教师所有课程")
+							.argument(GraphQLArgument.newArgument().name("schoolYear").type(Scalars.GraphQLString).build())
+							.argument(GraphQLArgument.newArgument().name("term").type(Scalars.GraphQLString).build())
+							.argument(GraphQLArgument.newArgument().name("teacherName").type(Scalars.GraphQLString).build())
+							.type(new GraphQLList(TeachingClassStudentSignInCountType.getType()))
+							.dataFetcher(environment ->  {
+								University university = environment.getSource();
+								String schoolYear = environment.getArgument("schoolYear");
+								String term = environment.getArgument("term");
+								String teacherName = environment.getArgument("teacherName");
+								if (schoolYear != null && term != null && teacherName != null) {
+									TeachingClassStudentSignInCountView t = new TeachingClassStudentSignInCountView();
+									t.setSchoolYear(schoolYear);
+									t.setTerm(term);
+									t.setTeacherName(teacherName);
+									t.setUniversityId(university.getId());
+									return teachingClassStudentSignInCountViewMapper.getCourseNameBySchoolYearAndTermAndTeacherName(t);
+								}
+								return teachingClassStudentSignInCountViewMapper.getCourseName(university.getId());
+							} )
+							.build())
+					.field(GraphQLFieldDefinition.newFieldDefinition()
+							.name("getCourseTime")
+							.description("该学年学期教师课程所有时间")
+							.argument(GraphQLArgument.newArgument().name("schoolYear").type(Scalars.GraphQLString).build())
+							.argument(GraphQLArgument.newArgument().name("term").type(Scalars.GraphQLString).build())
+							.argument(GraphQLArgument.newArgument().name("teacherName").type(Scalars.GraphQLString).build())
+							.argument(GraphQLArgument.newArgument().name("courseName").type(Scalars.GraphQLString).build())
+							.type(new GraphQLList(TeachingClassStudentSignInCountType.getType()))
+							.dataFetcher(environment ->  {
+								University university = environment.getSource();
+								String schoolYear = environment.getArgument("schoolYear");
+								String term = environment.getArgument("term");
+								String teacherName = environment.getArgument("teacherName");
+								String courseName = environment.getArgument("courseName");
+								if (schoolYear != null && term != null && teacherName != null && courseName != null) {
+									TeachingClassStudentSignInCountView t = new TeachingClassStudentSignInCountView();
+									t.setSchoolYear(schoolYear);
+									t.setTerm(term);
+									t.setTeacherName(teacherName);
+									t.setCourseName(courseName);
+									t.setUniversityId(university.getId());
+									return teachingClassStudentSignInCountViewMapper.getCourseTimeBySchoolYearAndTermAndTeacherNameAndCourseName(t);
+								}
+								return teachingClassStudentSignInCountViewMapper.getCourseTime(university.getId());
+							} )
+							.build())
+
 					.field(GraphQLFieldDefinition.newFieldDefinition()
 							.name("studentStatisticInfo")
 							.description("所有学生基本运动信息")
@@ -295,8 +395,14 @@ public class UniversityType {
 		}
 		return listField;
 	}
-	
-   @Autowired(required = true)
+
+	@Autowired(required = true)
+   	public void setTeachingClassStudentSignInCountViewMapper(
+			TeachingClassStudentSignInCountViewMapper teachingClassStudentSignInCountViewMapper) {
+		UniversityType.teachingClassStudentSignInCountViewMapper = teachingClassStudentSignInCountViewMapper;
+	}
+
+   	@Autowired(required = true)
     public void setUserMapper(UserMapper userMapper) {
         UniversityType.userMapper = userMapper;
     }
