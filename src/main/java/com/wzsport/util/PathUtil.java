@@ -18,8 +18,8 @@ public class PathUtil {
 	public static final String IMG_STORAGE_PATH = WEBAPP_PATH + File.separator + IMG_FOLDER_PATH + File.separator;
 	
 	public static final String FILE_FOLDER_PATH = "file" + File.separator;
-	public static final String FILE_STORAGE_PATH = WEBAPP_PATH + File.separator + FILE_FOLDER_PATH + File.separator;
-
+	public static final String FILE_STORAGE_PATH = WEBAPP_PATH + FILE_FOLDER_PATH ;
+    
     /**
      * 获取到classes目录
      *

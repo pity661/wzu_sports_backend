@@ -52,14 +52,14 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
 			String token = request.getHeader("Authorization");
 			System.out.println("token: " + token);
             System.out.println("request.getRequestURI():" + request.getRequestURI() + " request.getMethod(): " + request.getMethod());
-			if (token != null) {
-	//			SecurityUtils.getSubject().login(new UsernamePasswordToken(token, ""));
-				Claims claims = Jwts.parser().setSigningKey(KEY).parseClaimsJws(token).getBody();
-				logger.info(claims.toString());
-			} else {
-				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-				return false;
-			}
+//			if (token != null) {
+//	//			SecurityUtils.getSubject().login(new UsernamePasswordToken(token, ""));
+//				Claims claims = Jwts.parser().setSigningKey(KEY).parseClaimsJws(token).getBody();
+//				logger.info(claims.toString());
+//			} else {
+//				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//				return false;
+//			}
 		}
 		return super.preHandle(request, response, handler);
 	}

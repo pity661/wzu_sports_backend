@@ -7,6 +7,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +21,7 @@ import com.wzsport.model.AreaActivity;
 import com.wzsport.model.TeachingClassStudentSignInCountView;
 import com.wzsport.model.TeachingClassStudentSignInCountViewExample;
 import com.wzsport.model.TeachingClassStudentSignInCountViewExample.Criteria;
+import com.wzsport.util.PathUtil;
 import com.wzsport.util.ResponseBody;
 
 import io.swagger.annotations.Api;
@@ -31,7 +34,7 @@ import jxl.write.WritableWorkbook;
 
 @Api(tags = "TeachingClassSignInCountFile相关接口")
 @RestController()
-@RequestMapping(value = "/exportFile",produces = "application/json;charset=UTF-8")
+@RequestMapping(value = "/",produces = "application/json;charset=UTF-8")
 public class TeachingClassSignInCountFileController {
 	
 	@Autowired
@@ -39,7 +42,7 @@ public class TeachingClassSignInCountFileController {
 	
 	@SuppressWarnings("rawtypes")
 	@ApiOperation(value = "导出excel文件", notes = "根据用户页面上传的筛选条件获取所有的学生数据，生成excle文件并导出")
-	@RequestMapping(value = "", method = RequestMethod.POST)
+	@RequestMapping(value = "/exportFile", method = RequestMethod.POST)
 	public ResponseEntity<?> create(
 								@ApiParam("学年")
 								@RequestParam String schoolYear,
@@ -74,17 +77,19 @@ public class TeachingClassSignInCountFileController {
 		List<TeachingClassStudentSignInCountView> dataList = 
 				teachingClassStudentSignInCountViewMapper.selectByExample(example);
 		System.out.println(dataList.size());
-		
+		String excelName = null;
+		String fileName = null;
 		try {
 			//导出excel到桌面
 			WritableWorkbook wwb = null;
 			// 创建可写入的Excel工作簿
-			String excelName = String.valueOf(Calendar.getInstance().getTimeInMillis());
-	        String fileName = "F:"+File.separator+excelName+".xls";
+		    excelName = String.valueOf(Calendar.getInstance().getTimeInMillis()) + ".xls";
+	        fileName = PathUtil.FILE_STORAGE_PATH + excelName;
+	        System.out.println(fileName);
 	        
 	        File file=new File(fileName);
 	        if (!file.exists()) {
-	        	file.createNewFile();
+	        	    file.createNewFile();
 	        }
 	        //以fileName为文件名来创建一个Workbook
 	        wwb = Workbook.createWorkbook(file);
@@ -135,10 +140,6 @@ public class TeachingClassSignInCountFileController {
 			e.printStackTrace();
 		}
 		
-		
-		ResponseBody resBody = new ResponseBody<TeachingClassStudentSignInCountView>();
-		
-		int status = 1;
-		return ResponseEntity.status(status).body(resBody); 
+		return ResponseEntity.status(HttpServletResponse.SC_OK).body(excelName); 
 	}
 }
