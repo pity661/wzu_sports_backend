@@ -40,8 +40,13 @@ public class DownloadController {
 	    headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 	    // 设置相应内容的长度
         headers.setContentLength(file.length());
+        byte[] fileByte = FileUtils.readFileToByteArray(file);
         
-	    return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(file), headers, HttpStatus.OK);
+        if (file.exists()) {
+            boolean delete = file.delete();
+        }
+        
+	    return new ResponseEntity<byte[]>(fileByte, headers, HttpStatus.OK);
 	}
 	
 	/** * 根据浏览器的不同进行编码设置，返回编码后的文件名 */
