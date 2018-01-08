@@ -210,6 +210,15 @@ public class RunningActivityType {
 			                	return runningActivityDataMapper.selectByExample(example);
 							} )
 							.build())
+					.field(GraphQLFieldDefinition.newFieldDefinition()
+							.name("studentNo")
+							.description("返回数据中学生的学号")
+							.type(Scalars.GraphQLString)
+							.dataFetcher(environment ->  {
+								RunningActivityView runningActivity = environment.getSource();
+			                	return runningActivity.getStudentNo();
+							} )
+							.build())
 					.build();
 		}
 		return type;
@@ -277,6 +286,7 @@ public class RunningActivityType {
 					.argument(GraphQLArgument.newArgument().name("pageSize").type(Scalars.GraphQLInt).build())
 					.argument(GraphQLArgument.newArgument().name("qualified").type(Scalars.GraphQLBoolean).build())
 					.argument(GraphQLArgument.newArgument().name("isValid").type(Scalars.GraphQLBoolean).build())
+					.argument(GraphQLArgument.newArgument().name("selectAll").type(Scalars.GraphQLBoolean).build())
 					.type(PageType.getPageTypeBuidler(getType())
 														.name("RunningActivityPage")
 														.description("活动记录分页")
@@ -306,10 +316,19 @@ public class RunningActivityType {
 	                			return new Page<>();
 	                		}
 	                	}
-	                	
+	                	Student preciseStudent = null;
 	                	String studentNo = environment.getArgument("studentNo");
 	                	if (studentNo != null) {
 	                		StudentExample studentExample =  new StudentExample();
+	                		
+	                		StudentExample studentExample1 = new StudentExample();
+	                		com.wzsport.model.StudentExample.Criteria studentCriteria = studentExample1.createCriteria();
+	                		studentCriteria.andStudentNoEqualTo(studentNo);
+	                		studentCriteria.andUniversityIdEqualTo(universityId);
+	                		if (studentMapper.selectByExample(studentExample1).size() != 0) {
+	                			preciseStudent = studentMapper.selectByExample(studentExample1).get(0);
+	                		}
+	                		
 	                		studentExample.createCriteria().andStudentNoLike("%" + studentNo + "%");
 	                		List<Student> studentList = studentMapper.selectByExample(studentExample);
 	                		if(studentList.size() > 0) {
@@ -425,7 +444,20 @@ public class RunningActivityType {
 	                	}
 	                	PageHelper.startPage(pageNumber, pageSize);
 	                	example.setOrderByClause("start_time desc");
-	                	List<RunningActivityView> list = runningActivityViewMapper.selectByExample(example);
+	                	
+	                	List<RunningActivityView> list = new ArrayList();
+	                	Boolean selectAll = environment.getArgument("selectAll");
+	                	if (!selectAll) {
+		                	if (preciseStudent != null) {
+		                		RunningActivityViewExample ravExample = new RunningActivityViewExample();
+		                		ravExample.createCriteria().andStudentIdEqualTo(preciseStudent.getId());
+		                		list = runningActivityViewMapper.selectByExample(ravExample);
+		                	} else {
+			                	list = runningActivityViewMapper.selectByExample(example);
+		                	}
+	                	} else {
+		                	list = runningActivityViewMapper.selectByExample(example);
+	                	}
 	                	return list;
 	                } ).build();
     }
