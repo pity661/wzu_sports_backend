@@ -44,6 +44,8 @@ public class TeachingClassSignInCountFileController {
 	@ApiOperation(value = "导出excel文件", notes = "根据用户页面上传的筛选条件获取所有的学生数据，生成excle文件并导出")
 	@RequestMapping(value = "/exportFile", method = RequestMethod.POST)
 	public ResponseEntity<?> create(
+								@ApiParam("学校")
+								@RequestParam Long universityId,		
 								@ApiParam("学年")
 								@RequestParam String schoolYear,
 								@ApiParam("学期")
@@ -58,6 +60,9 @@ public class TeachingClassSignInCountFileController {
 								{
 		TeachingClassStudentSignInCountViewExample example = new TeachingClassStudentSignInCountViewExample();
 		Criteria criteria = example.createCriteria();
+		if (universityId != null) {
+			criteria.andUniversityIdEqualTo(universityId);
+		}
 		if (schoolYear.length() != 0) {
 			criteria.andSchoolYearEqualTo(schoolYear);
 		}
