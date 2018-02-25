@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.github.pagehelper.PageHelper;
 import com.wzsport.mapper.TermMapper;
 import com.wzsport.mapper.TermSportsTaskMapper;
 import com.wzsport.model.Term;
@@ -37,6 +38,7 @@ public class TermType {
 	private static GraphQLObjectType type;
 	private static GraphQLFieldDefinition singleQueryField;
 	private static GraphQLFieldDefinition listQueryField;
+	private static GraphQLFieldDefinition pagingQueryField;
 
 	private TermType() {}
 	
@@ -158,6 +160,30 @@ public class TermType {
 		}
         return listQueryField;
     }
+	
+	public static GraphQLFieldDefinition getPagingQueryField() {
+		if(pagingQueryField == null) {
+			pagingQueryField = GraphQLFieldDefinition.newFieldDefinition()
+					.argument(GraphQLArgument.newArgument().name("universityId").type(Scalars.GraphQLLong).build())
+					.argument(GraphQLArgument.newArgument().name("pageNumber").type(Scalars.GraphQLInt).build())
+					.argument(GraphQLArgument.newArgument().name("pageSize").type(Scalars.GraphQLInt).build())
+					.name("pagingTerms")
+					.description("大学分页")
+					.type(PageType.getPageTypeBuidler(getType())
+							.name("TermPage")
+							.description("学期分页")
+							.build())
+					.dataFetcher(environment -> {
+	                	long universityId = environment.getArgument("universityId");
+	                	PageHelper.startPage(environment.getArgument("pageNumber"), environment.getArgument("pageSize"));
+	                	TermExample termExample = new TermExample();
+	                	termExample.createCriteria().andUniversityIdEqualTo(universityId);
+	                	List<Term> termList = termMapper.selectByExample(termExample);
+	                	return termList;
+					} ).build();
+		}
+		return pagingQueryField;
+	}
 	
 	@Autowired(required = true)
 	public void setTermSportsTaskMapper(TermSportsTaskMapper termSportsTaskMapper) {
