@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.wzsport.mapper.SportsCourseMapper;
 import com.github.pagehelper.PageHelper;
 import com.wzsport.mapper.CollegeMapper;
 import com.wzsport.mapper.StudentStatisticViewMapper;
@@ -16,6 +17,7 @@ import com.wzsport.model.College;
 import com.wzsport.model.CollegeExample;
 import com.wzsport.model.StudentStatisticView;
 import com.wzsport.model.StudentStatisticViewExample;
+import com.wzsport.model.SportsCourse;
 import com.wzsport.model.TeacherExample;
 import com.wzsport.model.TeachingClassStudentSignInCountView;
 import com.wzsport.model.University;
@@ -42,6 +44,7 @@ public class UniversityType {
 	private static UniversityMapper universityMapper;
 	private static CollegeMapper collegeMapper;
 	private static TeacherMapper teacherMapper;
+	private static SportsCourseMapper sportsCourseMapper;
 	private static UserMapper userMapper;
 	private static StudentStatisticViewMapper studentStatisticViewMapper;
 	private static TermService termService;
@@ -358,6 +361,91 @@ public class UniversityType {
 								list = studentStatisticViewMapper.selectByExample(example);
 								return list;
 							}).build())
+					.field(GraphQLFieldDefinition.newFieldDefinition()
+							.name("teacherNameList")
+							.description("该校的所有体育教师")
+							.argument(GraphQLArgument.newArgument().name("schoolYear").type(Scalars.GraphQLString).build())
+							.argument(GraphQLArgument.newArgument().name("term").type(Scalars.GraphQLInt).build())
+							.type(new GraphQLList(SportsCourseType.getType()))
+							.dataFetcher(environment ->  {
+								University university = environment.getSource();
+								
+								String schoolYear = environment.getArgument("schoolYear");
+								Integer term = environment.getArgument("term");
+								if (schoolYear != null && term != null){
+									SportsCourse record = new SportsCourse();
+									record.setUniversityId(university.getId());
+									record.setTerm(term);
+									record.setSchoolYear(schoolYear);
+									return sportsCourseMapper.getTeacherNameBySchoolYearAndTerm(record);
+								} else {
+									return sportsCourseMapper.getTeacherName(university.getId());
+								}
+							} )
+							.build())
+					.field(GraphQLFieldDefinition.newFieldDefinition()
+							.name("schoolYearList")
+							.description("该校的所有学年")
+							.type(new GraphQLList(SportsCourseType.getType()))
+							.dataFetcher(environment ->  {
+								University university = environment.getSource();
+								return sportsCourseMapper.getSchoolYear(university.getId());
+							} )
+							.build())
+					.field(GraphQLFieldDefinition.newFieldDefinition()
+							.name("courseNameList")
+							.description("该校的所有体育课名")
+							.argument(GraphQLArgument.newArgument().name("schoolYear").type(Scalars.GraphQLString).build())
+							.argument(GraphQLArgument.newArgument().name("term").type(Scalars.GraphQLInt).build())
+							.argument(GraphQLArgument.newArgument().name("teacherName").type(Scalars.GraphQLString).build())
+							.type(new GraphQLList(SportsCourseType.getType()))
+							.dataFetcher(environment ->  {
+								
+								University university = environment.getSource();
+								String schoolYear = environment.getArgument("schoolYear");
+								String teacherName = environment.getArgument("teacherName");
+								Integer term = environment.getArgument("term");
+								
+								if (schoolYear != null && teacherName != null && term != null){
+									SportsCourse record = new SportsCourse();
+									record.setUniversityId(university.getId());
+									record.setSchoolYear(schoolYear);
+									record.setTeacherName(teacherName);
+									record.setTerm(term);
+									return sportsCourseMapper.getCourseNameBySchoolYearAndTermAndTeacherName(record);
+								}
+								return sportsCourseMapper.getCourseName(university.getId());
+							} )
+							.build())
+					.field(GraphQLFieldDefinition.newFieldDefinition()
+							.name("courseTimeList")
+							.description("该校的所有体育课时段")
+							.argument(GraphQLArgument.newArgument().name("schoolYear").type(Scalars.GraphQLString).build())
+							.argument(GraphQLArgument.newArgument().name("term").type(Scalars.GraphQLInt).build())
+							.argument(GraphQLArgument.newArgument().name("teacherName").type(Scalars.GraphQLString).build())
+							.argument(GraphQLArgument.newArgument().name("courseName").type(Scalars.GraphQLString).build())
+							.type(new GraphQLList(SportsCourseType.getType()))
+							.dataFetcher(environment ->  {
+								University university = environment.getSource();
+								
+								String schoolYear = environment.getArgument("schoolYear");
+								String teacherName = environment.getArgument("teacherName");
+								String courseName = environment.getArgument("courseName");
+								Integer term = environment.getArgument("term");
+								
+								if (schoolYear != null && teacherName != null && term != null && courseName != null){
+									SportsCourse record = new SportsCourse();
+									record.setUniversityId(university.getId());
+									record.setSchoolYear(schoolYear);
+									record.setTeacherName(teacherName);
+									record.setTerm(term);
+									record.setCourseName(courseName);
+									return sportsCourseMapper.getCourseTimeBySchoolYearAndTermAndTeacherNameAndCourseName
+											(record);
+								}
+								return sportsCourseMapper.getCourseTime(university.getId());
+							} )
+							.build())
 					.build();
 		}
 		
@@ -432,4 +520,8 @@ public class UniversityType {
 		UniversityType.studentStatisticViewMapper = studentStatisticViewMapper;
 	}
 	
+	@Autowired(required = true)
+	public void setSportsCourseMapper(SportsCourseMapper sportsCourseMapper) {
+		UniversityType.sportsCourseMapper = sportsCourseMapper;
+	}
 }

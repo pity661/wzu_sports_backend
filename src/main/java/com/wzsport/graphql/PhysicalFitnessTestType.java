@@ -33,7 +33,7 @@ public class PhysicalFitnessTestType {
 							.type(Scalars.GraphQLLong)
 							.build())
 					.field(GraphQLFieldDefinition.newFieldDefinition()
-							.name("gradle")
+							.name("grade")
 							.description("年级")
 							.type(Scalars.GraphQLInt)
 							.build())
