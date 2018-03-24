@@ -7,21 +7,21 @@
 
   <!-- 根据本地环境填写JDBC驱动包的路径 -->
   <!-- <classPathEntry location="/Users/chaiyu/mysql-connector-java-5.1.43/mysql-connector-java-5.1.43-bin.jar" /> -->
-  <!-- <classPathEntry location="C:/Users/mysql-connector-java-5.1.44/mysql-connector-java-5.1.44-bin.jar" /> -->
-        <classPathEntry location="/Users/nijun/Develop/Important/java/mysql-connector/mysql-connector-java-5.1.44-bin.jar" />
+  <classPathEntry location="C:/Users/mysql-connector-java-5.1.44/mysql-connector-java-5.1.44-bin.jar" />
+  <!-- <classPathEntry location="/Users/nijun/Develop/Important/java/mysql-connector/mysql-connector-java-5.1.44-bin.jar" /> -->
      
   <context id="wzsport" targetRuntime="MyBatis3">
-    <!-- <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+    <jdbcConnection driverClass="com.mysql.jdbc.Driver"
         connectionURL="jdbc:mysql://119.23.12.36:3306/wzsport_online"
         userId="remote"
         password="remote!QAZ">
-    </jdbcConnection> -->
+    </jdbcConnection>
     
-    <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+    <!-- <jdbcConnection driverClass="com.mysql.jdbc.Driver"
         connectionURL="jdbc:mysql://59.110.142.240:3306/wzsport"
         userId="remote"
         password="251725">
-    </jdbcConnection>
+    </jdbcConnection> -->
     
 
     <javaTypeResolver >
