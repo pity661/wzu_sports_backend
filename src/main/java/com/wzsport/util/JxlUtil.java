@@ -89,11 +89,13 @@ public class JxlUtil {
 		List<PhysicalTest> physicalTests = new ArrayList();
 		Workbook book;
 		Sheet sheet;
+		int recordRow = 0;
 		try {
 			book = Workbook.getWorkbook(file);
 			sheet = book.getSheet(0);
 			//第一行是名称，从第二行开始写
 			for (int i = 1; i<sheet.getRows(); i++) {
+				recordRow = i;
 				List<String> cel = new ArrayList();
 				PhysicalTest physicalTest = new PhysicalTest();
 				for (int j = 0; j<19;j++) {
@@ -124,28 +126,28 @@ public class JxlUtil {
 				physicalTest.setStudentNo(cel.get(5));
 				physicalTest.setMark(cel.get(6));
 				cel.set(7, testIsNull(cel.get(7)));
-				physicalTest.setTotalScore(new BigDecimal(cel.get(7)).doubleValue());
+				physicalTest.setTotalScore(new Double(cel.get(7)).doubleValue());
 				physicalTest.setTotalScoreGrade(cel.get(8));
 				cel.set(9, testIsNull(cel.get(9)));
-				physicalTest.setHeight(new BigDecimal(cel.get(9)).doubleValue());
+				physicalTest.setHeight(new Double(cel.get(9)).doubleValue());
 				cel.set(10, testIsNull(cel.get(10)));
-				physicalTest.setWeight(new BigDecimal(cel.get(10)).doubleValue());
+				physicalTest.setWeight(new Double(cel.get(10)).doubleValue());
 				cel.set(11, testNotDouble(cel.get(11)));
 				physicalTest.setVitalCapacity((long)new Long(cel.get(11)));
 				cel.set(12, testNotDouble(cel.get(12)));
 				physicalTest.setStandingLongJump(new Integer(cel.get(12)));
 				cel.set(13, testIsNull(cel.get(13)));
-				physicalTest.setSitAndReach(new BigDecimal(cel.get(13)).doubleValue());
+				physicalTest.setSitAndReach(new Double(cel.get(13)).doubleValue());
 				cel.set(14, testNotDouble(cel.get(14)));
 				physicalTest.setOneMinuteSitUp(new Integer(cel.get(14)));
 				cel.set(15, testNotDouble(cel.get(15)));
 				physicalTest.setPullUp(new Integer(cel.get(15)));
 				cel.set(16, testIsNull(cel.get(16)));
-				physicalTest.setFiftyRunTime(new BigDecimal(cel.get(16)).doubleValue());
+				physicalTest.setFiftyRunTime(new Double(cel.get(16)));
 				cel.set(17, testIsNull(cel.get(17)));
-				physicalTest.setEightHundredRunTime(new BigDecimal(cel.get(17)).doubleValue());
+				physicalTest.setEightHundredRunTime(new Double(cel.get(17)).doubleValue());
 				cel.set(18, testIsNull(cel.get(18)));
-				physicalTest.setOneThousandRunTime(new BigDecimal(cel.get(18)).doubleValue());
+				physicalTest.setOneThousandRunTime(new Double(cel.get(18)).doubleValue());
 				physicalTests.add(physicalTest);
 			}
 		} catch (BiffException e) {
@@ -154,6 +156,13 @@ public class JxlUtil {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (NumberFormatException e) {
+			physicalTests = new ArrayList();
+			PhysicalTest physicalTest = new PhysicalTest();
+			physicalTest.setStudentName("解析时发生错误");
+			physicalTest.setMark(String.valueOf(recordRow));
+			e.printStackTrace();
+			return physicalTests;
 		}
 		return physicalTests;
 	}

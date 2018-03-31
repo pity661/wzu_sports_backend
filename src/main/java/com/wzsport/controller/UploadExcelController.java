@@ -55,19 +55,26 @@ public class UploadExcelController {
 		File file = multipartToFile(multipartFile,fileName);
 		JxlUtil jxlUtil = new JxlUtil();
 		List<PhysicalTest> physicalTests = jxlUtil.dealPhysicalTest(file,universityId,schoolYear,term);
-		
+		file.delete();
+		if (physicalTests.size() == 1) {
+			if (physicalTests.get(0).getStudentName().equals("解析时发生错误")) {
+				return ResponseEntity.status(HttpServletResponse.SC_FORBIDDEN)
+						.body("解析第"+physicalTests.get(0).getMark()+"行时发生错误");
+			}
+		}
 		//读取成功新建线程处理任务
+		System.out.println("-------  开始插入数据    ---------");
 		Thread physicalTestThread = new Thread() {
 			public void run() {
 				for (PhysicalTest physicalTest:physicalTests) {
 					physicalTestService.updatePhysicalTest(physicalTest);
-					System.out.println(physicalTest.getHeight());
 				}
 			}
 		};
 		physicalTestThread.start();
 //		Runnable physicalTestRunnable = new PhysicalTestThread(physicalTests);
 //		new Thread(physicalTestRunnable).start();
+		System.out.println("-------  数据全部插入成功    ---------");
 		return ResponseEntity.status(HttpServletResponse.SC_OK).body("上传成功,等待服务器处理");
 	}
 	
@@ -86,7 +93,7 @@ public class UploadExcelController {
 		File file = multipartToFile(multipartFile,fileName);
 		JxlUtil jxlUtil = new JxlUtil();
 		List<SportsCourse> sportsCourses = jxlUtil.dealSportsCourse(file,universityId,schoolYear,term);
-		
+		file.delete();
 		//读取成功新建线程处理任务
 		Thread sportsCourseThread = new Thread() {
 			public void run() {
@@ -102,8 +109,9 @@ public class UploadExcelController {
 	private File multipartToFile(MultipartFile multfile,String fileName) throws IOException { 
 	    CommonsMultipartFile cf = (CommonsMultipartFile)multfile;  
 	    //这个myfile是MultipartFile的 
-	    DiskFileItem fi = (DiskFileItem) cf.getFileItem(); 
+	    DiskFileItem fi = (DiskFileItem) cf.getFileItem();
 	    File file = fi.getStoreLocation();
+	    System.out.println(file.getParent());
         File newNameFile = new File(file.getParent() + File.separator + fileName);
         file.renameTo(newNameFile);
 	    return newNameFile;
