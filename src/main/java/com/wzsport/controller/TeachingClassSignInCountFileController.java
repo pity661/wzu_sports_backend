@@ -144,7 +144,6 @@ public class TeachingClassSignInCountFileController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 		return ResponseEntity.status(HttpServletResponse.SC_OK).body(excelName); 
 	}
 }
