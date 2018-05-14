@@ -36,13 +36,13 @@ public class ExportServiceImpl implements ExportService {
 	@Override
 	public String createExcelByRunningActivityViews(List<RunningActivityView> lists) {
 		// TODO Auto-generated method stub
-		String fileName = null;
+		String excelName = null;
 		Format format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		try{
 			//生成excel文件
 			WritableWorkbook wwb = null;
-			String excelName = String.valueOf(Calendar.getInstance().getTimeInMillis()) + ".xls";
-	        fileName = PathUtil.FILE_STORAGE_PATH + excelName;
+			excelName = String.valueOf(Calendar.getInstance().getTimeInMillis()) + ".xls";
+			String fileName = PathUtil.FILE_STORAGE_PATH + excelName;
 			//fileName = "F://" + excelName;
 			File file = new File(fileName);
 			if (!file.exists()) {
@@ -110,7 +110,7 @@ public class ExportServiceImpl implements ExportService {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-		return fileName;
+		return excelName;
 	}
 
 
